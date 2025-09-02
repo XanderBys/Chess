@@ -7,7 +7,7 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessPosition {
-    private int row, col;
+    private final int row, col;
     public ChessPosition(int row, int col) {
         this.row = row;
         this.col = col;
@@ -27,5 +27,13 @@ public class ChessPosition {
      */
     public int getColumn() {
         return this.col;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPosition{" +
+                "row=" + row +
+                ", col=" + col +
+                '}';
     }
 }

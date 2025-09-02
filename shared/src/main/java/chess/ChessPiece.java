@@ -11,6 +11,7 @@ import java.util.Collection;
 public class ChessPiece {
     private final ChessGame.TeamColor color;
     private final ChessPiece.PieceType type;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
         this.type = type;
@@ -51,5 +52,50 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     *
+     * @return a string of one character representing the piece.
+     * Key:
+     * Upper case letters: white pieces
+     * Lower case letters: black pieces
+     *
+     * p: pawn
+     * r: rook
+     * n: knight
+     * b: bishop
+     * q: queen
+     * k: king
+     *
+     */
+    @Override
+    public String toString() {
+        String s = "";
+
+        if (this.type == PieceType.PAWN){
+            s += 'p';
+        }
+        else if (this.type == PieceType.ROOK){
+            s += 'r';
+        }
+        else if (this.type == PieceType.KNIGHT){
+            s += 'n';
+        }
+        else if (this.type == PieceType.BISHOP){
+            s += 'b';
+        }
+        else if (this.type == PieceType.QUEEN){
+            s += 'q';
+        }
+        else if (this.type == PieceType.KING){
+            s += 'k';
+        }
+
+        if (this.color == ChessGame.TeamColor.WHITE){
+            s = s.toUpperCase();
+        }
+
+        return s;
     }
 }

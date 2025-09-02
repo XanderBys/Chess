@@ -40,4 +40,26 @@ public class ChessBoard {
     public void resetBoard() {
 
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (ChessPiece[] row : board){
+            builder.append("|");
+            for (ChessPiece piece : row){
+                if (piece == null){
+                    builder.append(" ");
+                }
+                else{
+                    builder.append(piece);
+                }
+
+                builder.append("|");
+            }
+            builder.append("\n");
+        }
+
+        return builder.toString();
+    }
 }
