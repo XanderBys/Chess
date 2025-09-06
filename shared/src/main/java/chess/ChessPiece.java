@@ -13,9 +13,26 @@ public class ChessPiece {
     private final ChessGame.TeamColor color;
     private final ChessPiece.PieceType type;
 
+    private PieceMoveCalculator moveCalculator;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
         this.type = type;
+
+        switch (type){
+            case PieceType.KING:
+                moveCalculator = new KingMoveCalculator();
+            case PieceType.QUEEN:
+                moveCalculator = new QueenMoveCalculator();
+            case PieceType.BISHOP:
+                moveCalculator = new BishopMoveCalculator();
+            case PieceType.KNIGHT:
+                moveCalculator = new KnightMoveCalculator();
+            case PieceType.ROOK:
+                moveCalculator = new RookMoveCalculator();
+            case PieceType.PAWN:
+                moveCalculator = new PawnMoveCalculator();
+        }
     }
 
     /**
@@ -52,7 +69,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        return moveCalculator.pieceMoves(board, myPosition);
     }
 
     @Override
