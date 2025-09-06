@@ -1,5 +1,4 @@
 package chess;
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class RookMoveCalculator extends PieceMoveCalculator {

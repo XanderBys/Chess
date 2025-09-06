@@ -5,9 +5,6 @@ import java.util.Collection;
 public abstract class PieceMoveCalculator {
     ArrayList<ChessMove> moves = new ArrayList<>();
 
-    PieceMoveCalculator(){
-        this.moves = moves;
-    }
     /**
      * Calculates the possible moves for a piece on a given square on the given board.
      *
