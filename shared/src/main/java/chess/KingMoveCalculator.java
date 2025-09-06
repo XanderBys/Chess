@@ -1,5 +1,4 @@
 package chess;
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class KingMoveCalculator extends PieceMoveCalculator {
