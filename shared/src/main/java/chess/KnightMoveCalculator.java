@@ -1,6 +1,5 @@
 package chess;
 import java.util.Collection;
-import static java.lang.Math.abs;
 
 public class KnightMoveCalculator extends PieceMoveCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor pieceColor){

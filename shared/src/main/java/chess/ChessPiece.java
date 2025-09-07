@@ -97,7 +97,6 @@ public class ChessPiece {
      * Key:
      * Upper case letters: white pieces
      * Lower case letters: black pieces
-     *
      * p: pawn
      * r: rook
      * n: knight
