@@ -8,7 +8,7 @@ public class BishopMoveCalculator extends PieceMoveCalculator {
 
         for (int i = 1; i < 8; i++){
             // create a new position for each direction of search (the four diagonals)
-            ArrayList<ChessPosition> endPositions = new ArrayList<ChessPosition>();
+            ArrayList<ChessPosition> endPositions = new ArrayList<>();
             endPositions.add(new ChessPosition(position.getRow()+i, position.getColumn()+i));
             endPositions.add(new ChessPosition(position.getRow()+i, position.getColumn()-i));
             endPositions.add(new ChessPosition(position.getRow()-i, position.getColumn()+i));

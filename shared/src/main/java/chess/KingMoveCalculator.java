@@ -8,7 +8,7 @@ public class KingMoveCalculator extends PieceMoveCalculator {
 
         for (int i = -1; i <= 1; i++){
             for (int j = -1; j <= 1; j++){
-                if (row + i > 8 || row + i < 1 || col + j > 8 || col + i < 1){
+                if (row + i > 8 || row + i < 1 || col + j > 8 || col + j < 1){
                     // if the position is out of bounds, just skip it
                     continue;
                 }
