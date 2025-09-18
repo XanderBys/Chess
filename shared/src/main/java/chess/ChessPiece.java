@@ -1,4 +1,5 @@
 package chess;
+
 import java.util.Collection;
 import java.util.Objects;
 
@@ -9,34 +10,30 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private final ChessGame.TeamColor color;
-    private final ChessPiece.PieceType type;
-
-    private PieceMoveCalculator moveCalculator;
-
+    ChessGame.TeamColor pieceColor;
+    PieceType type;
+    PieceMoveCalculator moveCalculator;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.color = pieceColor;
+        this.pieceColor = pieceColor;
         this.type = type;
 
-        switch (type){
-            case PieceType.KING:
-                moveCalculator = new KingMoveCalculator();
-                break;
-            case PieceType.QUEEN:
-                moveCalculator = new QueenMoveCalculator();
-                break;
-            case PieceType.BISHOP:
-                moveCalculator = new BishopMoveCalculator();
-                break;
-            case PieceType.KNIGHT:
-                moveCalculator = new KnightMoveCalculator();
-                break;
-            case PieceType.ROOK:
-                moveCalculator = new RookMoveCalculator();
-                break;
-            case PieceType.PAWN:
-                moveCalculator = new PawnMoveCalculator();
-                break;
+        if (this.type == PieceType.KING){
+            moveCalculator = new KingMoveCalculator();
+        }
+        else if (this.type == PieceType.QUEEN){
+            moveCalculator = new QueenMoveCalculator();
+        }
+        else if (this.type == PieceType.ROOK){
+            moveCalculator = new RookMoveCalculator();
+        }
+        else if (this.type == PieceType.BISHOP){
+            moveCalculator = new BishopMoveCalculator();
+        }
+        else if (this.type == PieceType.KNIGHT){
+            moveCalculator = new KnightMoveCalculator();
+        }
+        else if (this.type == PieceType.PAWN){
+            moveCalculator = new PawnMoveCalculator();
         }
     }
 
@@ -56,7 +53,7 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return this.color;
+        return this.pieceColor;
     }
 
     /**
@@ -74,7 +71,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return moveCalculator.pieceMoves(board, myPosition, getTeamColor());
+        return moveCalculator.getMoves(board, myPosition, pieceColor);
     }
 
     @Override
@@ -83,52 +80,37 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return color == that.color && type == that.type;
+        return pieceColor == that.pieceColor && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(color, type);
+        return Objects.hash(pieceColor, type);
     }
 
-    /**
-     *
-     * @return a string of one character representing the piece.
-     * Key:
-     * Upper case letters: white pieces
-     * Lower case letters: black pieces
-     * p: pawn
-     * r: rook
-     * n: knight
-     * b: bishop
-     * q: queen
-     * k: king
-     *
-     */
     @Override
     public String toString() {
-        String s = "";
+        String s;
+        if (type == PieceType.KING){
+            s = "k";
+        }
+        else if (type == PieceType.QUEEN){
+            s = "q";
+        }
+        else if (type == PieceType.BISHOP){
+            s = "b";
+        }
+        else if (type == PieceType.KNIGHT){
+            s = "k";
+        }
+        else if (type == PieceType.ROOK){
+            s = "r";
+        }
+        else {
+            s = "p";
+        }
 
-        if (this.type == PieceType.PAWN){
-            s += 'p';
-        }
-        else if (this.type == PieceType.ROOK){
-            s += 'r';
-        }
-        else if (this.type == PieceType.KNIGHT){
-            s += 'n';
-        }
-        else if (this.type == PieceType.BISHOP){
-            s += 'b';
-        }
-        else if (this.type == PieceType.QUEEN){
-            s += 'q';
-        }
-        else if (this.type == PieceType.KING){
-            s += 'k';
-        }
-
-        if (this.color == ChessGame.TeamColor.WHITE){
+        if (pieceColor == ChessGame.TeamColor.WHITE){
             s = s.toUpperCase();
         }
 

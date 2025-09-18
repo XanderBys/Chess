@@ -1,47 +1,89 @@
 package chess;
+
 import java.util.ArrayList;
-import java.util.Collection;
 
 public abstract class PieceMoveCalculator {
-    ArrayList<ChessMove> moves = new ArrayList<>();
+    public ArrayList<ChessMove> moves = new ArrayList<>();
 
-    /**
-     * Calculates the possible moves for a piece on a given square on the given board.
-     *
-     * @param board The current ChessBoard instance
-     * @param position a ChessPosition representing the location of the piece
-     * @param pieceColor the color of the piece whose moves we're calculating (this matters because it affects which
-     *                   pieces we can capture)
-     * @return moves An ArrayList of ChessMove's containing all of the possible moves for the piece
-     */
-    public abstract Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor pieceColor);
+    public abstract ArrayList<ChessMove> getMoves(ChessBoard board, ChessPosition startPosition, ChessGame.TeamColor pieceColor);
 
-    /**
-     * Checks whether a move goes to a square where there is a piece and, if the move is valid, adds the move to this.moves
-     * @param board The current ChessBoard instance
-     * @param startPosition the starting position of the potential move
-     * @param endPosition the end position of the potential move
-     * @param pieceColor the color of the piece whose moves we're calculating
-     * @return true if the new position has a piece on it and false otherwise. This information should be used to determine
-     *          whether to continue iteration or stop early when calculating possible moves.
-     */
-    public boolean addMove(ChessBoard board, ChessPosition startPosition,
-                                       ChessPosition endPosition, ChessGame.TeamColor pieceColor){
-        ChessPiece piece = board.getPiece(endPosition);
-
-        if (piece == null){
-            // if piece is null, then the position is empty, so we add the move and continue
-            moves.add(new ChessMove(startPosition, endPosition));
-            return false;
+    public void searchOutwards(ChessBoard board, ChessPosition startPosition, int[][] directions, ChessGame.TeamColor pieceColor){
+        boolean[] continueSearch = new boolean[directions.length];
+        for (int i = 0; i < directions.length; i++){
+            continueSearch[i] = true;
         }
-        else if (piece.getTeamColor() == pieceColor){
-            // the piece on endPosition is our same team, so we stop short here
-            return true;
+        int offset = 1;
+
+        while (anyTrue(continueSearch)){
+            continueSearch = addMoves(board, startPosition, directions, pieceColor, offset, continueSearch);
+            offset++;
+        }
+    }
+
+    public boolean[] addMoves(ChessBoard board, ChessPosition startPosition, int[][] directions,
+                              ChessGame.TeamColor pieceColor, int offset, boolean[] continueSearch,
+                              ChessPiece.PieceType promotionPiece){
+        int startRow = startPosition.getRow(), startCol = startPosition.getColumn();
+        for (int i = 0; i < directions.length; i++){
+            ChessPosition newPosition = new ChessPosition(startRow + directions[i][0] * offset,
+                                                          startCol + directions[i][1] * offset);
+
+            if (continueSearch[i] && newPosition.isValid()){
+                ChessGame.TeamColor color = getColorAt(board, newPosition);
+                if (color == null){
+                    moves.add(new ChessMove(startPosition, newPosition, promotionPiece));
+                }
+                else if (color == pieceColor){
+                    // this is a piece of our own color, so we stop short
+                    continueSearch[i] = false;
+                }
+                else{
+                    // this is a piece of the opposing team, so we stop here, but we can add this move
+                    moves.add(new ChessMove(startPosition, newPosition, promotionPiece));
+                    continueSearch[i] = false;
+                }
+            }
+            else{
+                continueSearch[i] = false;
+            }
+        }
+        return continueSearch;
+    }
+
+    public boolean[] addMoves(ChessBoard board, ChessPosition startPosition, int[][] directions,
+                              ChessGame.TeamColor pieceColor, int offset, boolean[] continueSearch){
+        return addMoves(board, startPosition, directions, pieceColor, offset, continueSearch, null);
+    }
+
+    public void addMoves(ChessBoard board, ChessPosition startPosition, int[][] directions,
+                         ChessGame.TeamColor pieceColor, ChessPiece.PieceType promotionPiece){
+        boolean[] continueSearch = new boolean[directions.length];
+        for (int i = 0; i < continueSearch.length; i++){
+            continueSearch[i] = true;
+        }
+        addMoves(board, startPosition, directions, pieceColor, 1, continueSearch, promotionPiece);
+    }
+
+    public void addMoves(ChessBoard board, ChessPosition startPosition, int[][] directions,
+                         ChessGame.TeamColor pieceColor){
+        addMoves(board, startPosition, directions, pieceColor, null);
+    }
+
+    public ChessGame.TeamColor getColorAt(ChessBoard board, ChessPosition position){
+        ChessPiece piece = board.getPiece(position);
+        if (piece == null){
+            return null;
         }
         else {
-            // there's an enemy piece on endPosition, so we can capture it
-            moves.add(new ChessMove(startPosition, endPosition));
-            return true;
+            return piece.getTeamColor();
         }
+    }
+    public boolean anyTrue(boolean[] arr){
+        for (boolean x : arr){
+            if (x){
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,91 +1,74 @@
 package chess;
+
 import java.util.ArrayList;
-import java.util.Collection;
 
-public class PawnMoveCalculator extends PieceMoveCalculator {
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor pieceColor){
-        int row = position.getRow(), col = position.getColumn();
-        int startRow;
-        int promotionRow;
+public class PawnMoveCalculator extends PieceMoveCalculator{
+    @Override
+    public ArrayList<ChessMove> getMoves(ChessBoard board, ChessPosition startPosition, ChessGame.TeamColor pieceColor) {
+        int startRow = startPosition.getRow(), startCol = startPosition.getColumn();
+
         int direction;
+        int promotionRow;
+
         if (pieceColor == ChessGame.TeamColor.WHITE){
-            startRow = 2;
-            promotionRow = 8;
             direction = 1;
+            promotionRow = 8;
         }
         else{
-            startRow = 7;
-            promotionRow = 1;
             direction = -1;
+            promotionRow = 1;
         }
 
-        ChessPosition frontPosition = new ChessPosition(row+direction, col);
-        ChessPosition leftDiagonalPosition = new ChessPosition(row+direction, col - 1);
-        ChessPosition rightDiagonalPosition = new ChessPosition(row+direction, col + 1);
-        ChessPiece frontPiece, leftDiagonalPiece, rightDiagonalPiece;
-        boolean promotion;
-        if (row+direction == promotionRow){
-            promotion = true;
-            frontPiece = board.getPiece(frontPosition);
-        }
-        else if ((direction == 1 && row+direction < promotionRow) || (direction == -1 && row+direction > promotionRow)){
-            promotion = false;
-            frontPiece = board.getPiece(frontPosition);
+        boolean onStart = (pieceColor == ChessGame.TeamColor.WHITE && startRow == 2) ||
+                          (pieceColor == ChessGame.TeamColor.BLACK && startRow == 7);
+
+        ChessGame.TeamColor oppositeColor;
+        if (pieceColor == ChessGame.TeamColor.WHITE){
+            oppositeColor = ChessGame.TeamColor.BLACK;
         }
         else{
-            return moves;
+            oppositeColor = ChessGame.TeamColor.WHITE;
         }
 
-        if (col - 1 >= 1){
-            leftDiagonalPiece = board.getPiece(leftDiagonalPosition);
-        }
-        else{
-            leftDiagonalPiece = null;
-        }
-        if (col + 1 <= 8){
-            rightDiagonalPiece = board.getPiece(rightDiagonalPosition);
-        }
-        else{
-            rightDiagonalPiece = null;
-        }
-
-        ArrayList<ChessPosition> endPositions = new ArrayList<>();
         ArrayList<ChessPiece.PieceType> promotionPieces = new ArrayList<>();
-        if (frontPiece == null){
-            endPositions.add(frontPosition);
-        }
-        if (leftDiagonalPiece != null && leftDiagonalPiece.getTeamColor() != pieceColor) {
-            endPositions.add(leftDiagonalPosition);
-        }
-        if (rightDiagonalPiece != null && rightDiagonalPiece.getTeamColor() != pieceColor) {
-            endPositions.add(rightDiagonalPosition);
-        }
-
-        if (row == startRow){
-            ChessPosition oneAhead = new ChessPosition(row + direction, col);
-            ChessPosition twoAhead = new ChessPosition(row + 2*direction, col);
-            if (board.getPiece(oneAhead) == null && board.getPiece(twoAhead) == null){
-                moves.add(new ChessMove(position, twoAhead));
-            }
-        }
-
-        if (promotion){
+        if (startRow + direction == promotionRow){
             promotionPieces.add(ChessPiece.PieceType.QUEEN);
             promotionPieces.add(ChessPiece.PieceType.ROOK);
             promotionPieces.add(ChessPiece.PieceType.BISHOP);
             promotionPieces.add(ChessPiece.PieceType.KNIGHT);
-            for (ChessPiece.PieceType promotionPiece : promotionPieces){
-                for (ChessPosition endPosition : endPositions){
-                    moves.add(new ChessMove(position, endPosition, promotionPiece));
-                }
-            }
         }
         else{
-            for (ChessPosition endPosition : endPositions){
-                moves.add(new ChessMove(position, endPosition));
-            }
+            promotionPieces.add(null);
         }
+
+        for (ChessPiece.PieceType piece : promotionPieces){
+            ChessPosition front = new ChessPosition(startRow + direction, startCol);
+            ChessPosition leftDiag = new ChessPosition(startRow + direction, startCol - 1);
+            ChessPosition rightDiag = new ChessPosition(startRow + direction, startCol + 1);
+
+            if (front.isValid() && board.getPiece(front) == null){
+                moves.add(new ChessMove(startPosition, front, piece));
+                ChessPosition twoFront = new ChessPosition(startRow + 2 * direction, startCol);
+
+                if (onStart && board.getPiece(twoFront) == null){
+                    moves.add(new ChessMove(startPosition, twoFront));
+                }
+            }
+
+            if (leftDiag.isValid() && getColorAt(board, leftDiag) == oppositeColor){
+                moves.add(new ChessMove(startPosition, leftDiag, piece));
+            }
+
+            if (rightDiag.isValid() && getColorAt(board, rightDiag) == oppositeColor){
+                moves.add(new ChessMove(startPosition, rightDiag, piece));
+            }
+
+        }
+
+
 
         return moves;
     }
+
+
 }
