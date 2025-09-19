@@ -36,6 +36,9 @@ public class ChessBoard implements Cloneable{
         return board[position.getRow()-1][position.getColumn()-1];
     }
 
+    private void setBoard(ChessPiece[][] newBoard){
+        board = newBoard;
+    }
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
@@ -102,11 +105,19 @@ public class ChessBoard implements Cloneable{
     @Override
     protected Object clone() throws CloneNotSupportedException {
         ChessBoard cloneBoard = (ChessBoard) super.clone();
+        cloneBoard.setBoard(new ChessPiece[8][8]);
 
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++){
                 ChessPosition pos = new ChessPosition(i, j);
-                ChessPiece clonePiece = (ChessPiece) cloneBoard.getPiece(pos).clone();
+                ChessPiece piece = getPiece(pos);
+                ChessPiece clonePiece;
+                if (piece == null){
+                    clonePiece = null;
+                }
+                else{
+                    clonePiece = (ChessPiece) piece.clone();
+                }
                 cloneBoard.addPiece(pos, clonePiece);
             }
         }
