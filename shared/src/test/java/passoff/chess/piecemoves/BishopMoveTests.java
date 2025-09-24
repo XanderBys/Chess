@@ -69,4 +69,21 @@ public class BishopMoveTests {
         );
     }
 
+    @Test
+    public void strangeSituationWithBishop(){
+        TestUtilities.validateMoves("""
+                        | | | | | | | | |
+                        | | | | | | | | |
+                        | | | | | | | | |
+                        | | | | | | | | |
+                        | | | | | | | | |
+                        | | | | | | | | |
+                        | | | | |R| |P| |
+                        | | | | | |B| | |
+                        """,
+                new ChessPosition(1, 6),
+                new int[][]{}
+        );
+    }
+
 }

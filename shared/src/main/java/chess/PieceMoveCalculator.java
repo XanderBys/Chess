@@ -69,6 +69,10 @@ public abstract class PieceMoveCalculator {
         addMoves(board, startPosition, directions, pieceColor, null);
     }
 
+    public void resetMoves(){
+        moves = new ArrayList<>();
+    }
+
     public ChessGame.TeamColor getColorAt(ChessBoard board, ChessPosition position){
         ChessPiece piece = board.getPiece(position);
         if (piece == null){

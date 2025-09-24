@@ -71,6 +71,7 @@ public class ChessPiece implements Cloneable {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        moveCalculator.resetMoves();
         return moveCalculator.getMoves(board, myPosition, pieceColor);
     }
 
@@ -101,7 +102,7 @@ public class ChessPiece implements Cloneable {
             s = "b";
         }
         else if (type == PieceType.KNIGHT){
-            s = "k";
+            s = "n";
         }
         else if (type == PieceType.ROOK){
             s = "r";
