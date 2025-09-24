@@ -58,7 +58,7 @@ public class ChessGame {
 
         Collection<ChessMove> pieceMoves = new ArrayList<>(piece.pieceMoves(board, startPosition));
         for (ChessMove move : pieceMoves) {
-            if (isValidMove(board, move, piece.getTeamColor())) {
+            if (isValidMove(board, move)) {
                 moves.add(move);
             }
         }
@@ -99,7 +99,7 @@ public class ChessGame {
         board.addPiece(move.getStartPosition(), null);
     }
 
-    public boolean isValidMove(ChessBoard board, ChessMove move, TeamColor teamTurn){
+    public boolean isValidMove(ChessBoard board, ChessMove move){
         // first check if the move is contained in the possible moves calculated for that piece
         // then,
         ChessPosition startPosition = move.getStartPosition();
@@ -121,10 +121,6 @@ public class ChessGame {
 
         return true;
     }
-    private boolean isValidMove(ChessBoard board, ChessMove move) {
-        return isValidMove(board, move, this.teamTurn);
-    }
-
 
     private boolean isValidMove(ChessMove move){
         return isValidMove(this.board, move);
@@ -143,8 +139,8 @@ public class ChessGame {
         iterate over validMoves for that piece
         if one of the moves ends where king currently is,
         return true
-        
          */
+
         ChessPosition kingPosition = findKingPosition(board, teamColor);
 
         for (int i = 1; i <= 8; i++){
@@ -190,10 +186,6 @@ public class ChessGame {
             }
         }
         return null;
-    }
-
-    private ChessPosition findKingPosition(TeamColor teamColor){
-        return findKingPosition(this.board, teamColor);
     }
 
     /**

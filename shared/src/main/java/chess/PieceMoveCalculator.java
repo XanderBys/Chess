@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public abstract class PieceMoveCalculator {
     public ArrayList<ChessMove> moves = new ArrayList<>();
@@ -58,9 +59,8 @@ public abstract class PieceMoveCalculator {
     public void addMoves(ChessBoard board, ChessPosition startPosition, int[][] directions,
                          ChessGame.TeamColor pieceColor, ChessPiece.PieceType promotionPiece){
         boolean[] continueSearch = new boolean[directions.length];
-        for (int i = 0; i < continueSearch.length; i++){
-            continueSearch[i] = true;
-        }
+        Arrays.fill(continueSearch, true);
+
         addMoves(board, startPosition, directions, pieceColor, 1, continueSearch, promotionPiece);
     }
 
