@@ -13,15 +13,24 @@ public class ChessMove {
     ChessPosition startPosition;
     ChessPosition endPosition;
     ChessPiece.PieceType promotionPiece;
+    boolean enPassant;
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
-                     ChessPiece.PieceType promotionPiece) {
+                     ChessPiece.PieceType promotionPiece, boolean enPassant) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
+        this.enPassant = enPassant;
     }
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition) {
-        this(startPosition, endPosition, null);
+        this(startPosition, endPosition, null, false);
+    }
+
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece){
+        this(startPosition, endPosition, promotionPiece, false);
+    }
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition, boolean enPassant) {
+        this(startPosition, endPosition, null, enPassant);
     }
 
     /**
@@ -48,6 +57,10 @@ public class ChessMove {
         return promotionPiece;
     }
 
+    public boolean isEnPassant(){
+        return enPassant;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -70,6 +83,7 @@ public class ChessMove {
                 "startPosition=" + startPosition +
                 ", endPosition=" + endPosition +
                 ", promotionPiece=" + promotionPiece +
+                ", enPassant=" + enPassant +
                 '}';
     }
 }

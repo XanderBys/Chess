@@ -1,8 +1,11 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+
+import static java.lang.Math.abs;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -13,6 +16,7 @@ import java.util.Objects;
 public class ChessGame {
     TeamColor teamTurn;
     ChessBoard board = new ChessBoard();
+    boolean[][] enPassant = new boolean[8][8];
     public ChessGame() {
         board.resetBoard();
         teamTurn = TeamColor.WHITE;
@@ -74,6 +78,17 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = board.getPiece(move.getStartPosition());
+
+        // the test cases don't have an enPassant flag in 'move',
+        // so we have to check and set the flag manually if it is an en passant move
+        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN
+                && move.getEndPosition().getColumn() != move.getStartPosition().getColumn()
+                && board.getPiece(move.getEndPosition()) == null){
+            // if the piece is a pawn AND it moves diagonally AND the end square is empty
+            // it has to be enPassant, since we already confirmed the move was valid
+            move = new ChessMove(move.getStartPosition(), move.getEndPosition(), true);
+        }
+
         if (!isValidMove(move) || (piece != null && piece.getTeamColor() != teamTurn)){
             throw new InvalidMoveException(move + " is not a valid move with board:\n" + board + "\nand " + teamTurn + " to play.");
         }
@@ -86,11 +101,28 @@ public class ChessGame {
         else {
             teamTurn = TeamColor.WHITE;
         }
+
+        // update the en passant tracker.
+        // first, reset it to be all 'false' so that en passant only works for one move after the pawn moves
+        enPassant = new boolean[8][8];
+
+        // then, if a pawn moved into en passant range, set the flag to be true
+        int rowDiff = abs(move.getEndPosition().getRow() - move.getStartPosition().getRow());
+        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN && rowDiff == 2){
+            // in this case, a pawn has moved up two squares, so set the en passant flag for that square to be true
+            allowEnPassant(move.getEndPosition());
+        }
     }
 
     public void updateBoard(ChessBoard board, ChessMove move){
         ChessPiece pieceToMove = board.getPiece(move.getStartPosition());
-        if (move.getPromotionPiece() == null){
+        if (move.isEnPassant()){
+            ChessPosition capturePosition = new ChessPosition(move.getStartPosition().getRow(), 
+                                                              move.getEndPosition().getColumn());
+            board.addPiece(move.getEndPosition(), pieceToMove);
+            board.addPiece(capturePosition, null);
+        }
+        else if (move.getPromotionPiece() == null){
             board.addPiece(move.getEndPosition(), pieceToMove);
         }
         else{
@@ -106,6 +138,11 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
 
         if (piece == null || !piece.pieceMoves(board, startPosition).contains(move)) {
+            return false;
+        }
+        else if (move.isEnPassant()
+                && !enPassantAllowed(new ChessPosition(move.getStartPosition().getRow(),
+                                                       move.getEndPosition().getColumn())) ){
             return false;
         }
 
@@ -168,6 +205,14 @@ public class ChessGame {
         return isInCheck(this.board, teamColor);
     }
 
+
+    private boolean enPassantAllowed(ChessPosition pos){
+        return enPassant[pos.getRow() - 1][pos.getColumn() - 1];
+    }
+
+    private void allowEnPassant(ChessPosition pos){
+        enPassant[pos.getRow() - 1][pos.getColumn() - 1] = true;
+    }
     /**
      * Determine and return the location of the king for the given board and color
      *
