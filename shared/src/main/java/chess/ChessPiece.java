@@ -13,7 +13,6 @@ public class ChessPiece implements Cloneable {
     ChessGame.TeamColor pieceColor;
     PieceType type;
     PieceMoveCalculator moveCalculator;
-    int startRow;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -36,22 +35,6 @@ public class ChessPiece implements Cloneable {
         }
         else if (this.type == PieceType.PAWN){
             moveCalculator = new PawnMoveCalculator();
-        }
-
-        if (this.type == PieceType.PAWN){
-            if (this.pieceColor == ChessGame.TeamColor.WHITE) {
-                startRow = 2;
-            }
-            else{
-                startRow = 7;
-            }
-        }
-        else {
-            if (this.pieceColor == ChessGame.TeamColor.WHITE) {
-                startRow = 1;
-            } else {
-                startRow = 8;
-            }
         }
     }
 
@@ -81,9 +64,6 @@ public class ChessPiece implements Cloneable {
         return this.type;
     }
 
-    public int getStartRow(){
-        return startRow;
-    }
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
