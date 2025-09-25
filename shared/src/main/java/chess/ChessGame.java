@@ -270,12 +270,7 @@ public class ChessGame {
         try {
             ChessBoard boardCopy = (ChessBoard) board.clone();
             updateBoard(boardCopy, move);
-            if (isInCheck(boardCopy, piece.getTeamColor())){
-                return true;
-            }
-            else{
-                return false;
-            }
+            return isInCheck(boardCopy, piece.getTeamColor());
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
