@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 public class UserServiceTest {
     private UserService userService;
 
-    private String username = "Xman";
-    private String password = "very secure";
-    private String email = "abc@gmail.com";
+    private final String username = "Xman";
+    private final String password = "very secure";
+    private final String email = "abc@gmail.com";
     private UserData newUser;
 
     @BeforeEach
@@ -42,7 +42,7 @@ public class UserServiceTest {
 
     @Test
     public void usernameTaken() {
-        RegisterResult result = userService.register(newUser);
+        userService.register(newUser);
 
         UserData identicalUser = new UserData(username, password, email);
         UserData sameUsername = new UserData(username, "12345", "none");
