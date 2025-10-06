@@ -5,7 +5,7 @@ import model.UserData;
 import java.util.HashMap;
 
 public class LocalUserDao extends UserDao {
-    HashMap<String, UserData> users;
+    HashMap<String, UserData> users = new HashMap<>();
 
     @Override
     public UserData getUserData(String username) {

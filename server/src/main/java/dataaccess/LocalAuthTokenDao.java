@@ -5,7 +5,7 @@ import model.AuthData;
 import java.util.HashSet;
 
 public class LocalAuthTokenDao extends AuthTokenDao {
-    HashSet<AuthData> authorizations;
+    HashSet<AuthData> authorizations = new HashSet<>();
 
     @Override
     public void createAuth(AuthData authData) {
