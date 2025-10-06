@@ -11,4 +11,9 @@ public class LocalAuthTokenDao extends AuthTokenDao {
     public void createAuth(AuthData authData) {
         authorizations.add(authData);
     }
+
+    @Override
+    public void clear() {
+        authorizations = new HashSet<>();
+    }
 }

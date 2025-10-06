@@ -16,4 +16,9 @@ public class LocalUserDao extends UserDao {
     public void createUser(UserData userData) {
         users.put(userData.username(), userData);
     }
+
+    @Override
+    public void clear() {
+        users = new HashMap<>();
+    }
 }
