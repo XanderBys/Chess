@@ -1,9 +1,8 @@
 package service;
 
 import dataaccess.AuthTokenDao;
-import dataaccess.LocalAuthTokenDao;
-import dataaccess.LocalUserDao;
 import dataaccess.UserDao;
+import dataaccess.UserNotFoundException;
 import handlers.RegisterResult;
 import model.AuthData;
 import model.UserData;
@@ -11,14 +10,18 @@ import model.UserData;
 import java.util.UUID;
 
 public class UserService {
-    UserDao userDao = new LocalUserDao();
-    AuthTokenDao authDao = new LocalAuthTokenDao();
+    UserDao userDao;
+    AuthTokenDao authDao;
 
+    public UserService(UserDao userDao, AuthTokenDao authDao) {
+        this.userDao = userDao;
+        this.authDao = authDao;
+    }
     public static String generateAuthToken() {
         return UUID.randomUUID().toString();
     }
 
-    RegisterResult register(UserData request) throws AlreadyTakenException {
+    public RegisterResult register(UserData request) throws AlreadyTakenException {
         UserData userData = userDao.getUserData(request.username());
         if (userData != null) {
             throw new AlreadyTakenException("Username " + request.username() + " is already taken");
@@ -30,5 +33,13 @@ public class UserService {
         authDao.createAuth(authData);
 
         return new RegisterResult(request.username(), authData);
+    }
+
+    public UserData getUser(String username) throws UserNotFoundException {
+        UserData data = userDao.getUserData(username);
+        if (data == null) {
+            throw new UserNotFoundException(username);
+        }
+        return data;
     }
 }
