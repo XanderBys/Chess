@@ -5,10 +5,10 @@ import chess.ChessGame;
 import java.util.HashSet;
 
 public class LocalGameDao extends GameDao {
-    private HashSet<ChessGame> games = new HashSet<>();
+    private static HashSet<ChessGame> games = new HashSet<>();
 
     @Override
     public void clear() {
-        games = new HashSet<>();
+        LocalGameDao.games = new HashSet<>();
     }
 }

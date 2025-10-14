@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.*;
 import handlers.RegisterResult;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
@@ -8,6 +9,11 @@ import org.junit.jupiter.api.Test;
 
 public class UserServiceTest {
     private UserService userService;
+    private ClearService clearService;
+
+    private GameDao gameDao;
+    private AuthTokenDao authDao;
+    private UserDao userDao;
 
     private final String username = "Xman";
     private final String password = "very secure";
@@ -16,7 +22,14 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userService = new UserService();
+        userDao = new LocalUserDao();
+        authDao = new LocalAuthTokenDao();
+        gameDao = new LocalGameDao();
+
+        ClearService clearService = new ClearService(userDao, authDao, gameDao);
+        clearService.clear();
+
+        userService = new UserService(userDao, authDao);
         newUser = new UserData(username, password, email);
     }
 
