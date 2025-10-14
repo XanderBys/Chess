@@ -1,6 +1,5 @@
 package service;
 
-import dataaccess.AuthTokenDao;
 import dataaccess.LocalAuthTokenDao;
 import dataaccess.LocalUserDao;
 import dataaccess.UserDao;
@@ -11,9 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class UserServiceTest {
-    private UserDao userDao;
-    private AuthTokenDao authDao;
-
     private UserService userService;
 
     private final String username = "Xman";
@@ -23,8 +19,8 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userDao = new LocalUserDao();
-        authDao = new LocalAuthTokenDao();
+        UserDao userDao = new LocalUserDao();
+        AuthDao authDao = new LocalAuthTokenDao();
 
         userService = new UserService(userDao, authDao);
         newUser = new UserData(username, password, email);

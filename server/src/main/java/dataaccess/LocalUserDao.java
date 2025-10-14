@@ -7,6 +7,7 @@ import java.util.HashMap;
 public class LocalUserDao extends UserDao {
     HashMap<String, UserData> users = new HashMap<>();
 
+    // TODO: add DataAccessException here
     @Override
     public UserData getUserData(String username) {
         return users.get(username);

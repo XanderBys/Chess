@@ -23,6 +23,14 @@ public class UserService {
     }
 
     public RegisterResult register(UserData request) throws AlreadyTakenException {
+        if (request.username() == null || request.username().isEmpty()) {
+            throw new BadRequestException("Error: username is a required field");
+        } else if (request.password() == null || request.password().isEmpty()) {
+            throw new BadRequestException("Error: password is a required field");
+        } else if (request.email() == null || request.email().isEmpty()) {
+            throw new BadRequestException("Error: email is a required field");
+        }
+
         UserData userData = userDao.getUserData(request.username());
         if (userData != null) {
             throw new AlreadyTakenException("Error: Username " + request.username() + " is already taken");
@@ -36,11 +44,12 @@ public class UserService {
         return new RegisterResult(request.username(), authData);
     }
 
-    public UserData getUser(String username) throws UserNotFoundException {
+    public UserData getUser(String username) throws UserNotFoundException, BadRequestException {
         UserData data = userDao.getUserData(username);
         if (data == null) {
             throw new UserNotFoundException(username);
         }
+
         return data;
     }
 }
