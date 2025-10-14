@@ -15,12 +15,10 @@ public class ClearServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userDao = new LocalUserDao();
-        authDao = new LocalAuthTokenDao();
         gameDao = new LocalGameDao();
 
-        clearService = new ClearService(userDao, authDao, gameDao);
-        userService = new UserService(userDao, authDao);
+        clearService = new ClearService();
+        userService = new UserService();
     }
 
     @Test

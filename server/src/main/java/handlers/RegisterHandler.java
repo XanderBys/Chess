@@ -1,9 +1,11 @@
 package handlers;
 
 import io.javalin.http.Context;
+import service.UserService;
 
 public class RegisterHandler extends Handler {
     public static void handleRegister(Context ctx) {
-        ctx.result("I'm a register handler! I don't do anything yet.\n");
+        UserService userService = new UserService();
+
     }
 }

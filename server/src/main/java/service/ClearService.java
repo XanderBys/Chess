@@ -1,18 +1,22 @@
 package service;
 
-import dataaccess.AuthTokenDao;
-import dataaccess.GameDao;
-import dataaccess.UserDao;
+import dataaccess.*;
 
 public class ClearService {
     UserDao userDao;
     AuthTokenDao authDao;
     GameDao gameDao;
 
-    ClearService(UserDao userDao, AuthTokenDao authDao, GameDao gameDao) {
-        this.userDao = userDao;
-        this.authDao = authDao;
-        this.gameDao = gameDao;
+    public ClearService(boolean useLocalData) {
+        if (useLocalData) {
+            userDao = new LocalUserDao();
+            authDao = new LocalAuthTokenDao();
+            gameDao = new LocalGameDao();
+        }
+    }
+
+    public ClearService() {
+        this(true);
     }
 
     public void clear() {

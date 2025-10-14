@@ -1,6 +1,8 @@
 package service;
 
-import dataaccess.*;
+import dataaccess.AuthTokenDao;
+import dataaccess.GameDao;
+import dataaccess.UserDao;
 import handlers.RegisterResult;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
@@ -22,14 +24,11 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userDao = new LocalUserDao();
-        authDao = new LocalAuthTokenDao();
-        gameDao = new LocalGameDao();
-
-        ClearService clearService = new ClearService(userDao, authDao, gameDao);
+        ClearService clearService = new ClearService();
         clearService.clear();
 
-        userService = new UserService(userDao, authDao);
+        userService = new UserService();
+
         newUser = new UserData(username, password, email);
     }
 

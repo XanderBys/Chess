@@ -1,8 +1,6 @@
 package service;
 
-import dataaccess.AuthTokenDao;
-import dataaccess.UserDao;
-import dataaccess.UserNotFoundException;
+import dataaccess.*;
 import handlers.RegisterResult;
 import model.AuthData;
 import model.UserData;
@@ -13,10 +11,17 @@ public class UserService {
     UserDao userDao;
     AuthTokenDao authDao;
 
-    public UserService(UserDao userDao, AuthTokenDao authDao) {
-        this.userDao = userDao;
-        this.authDao = authDao;
+    public UserService(boolean useLocalData) {
+        if (useLocalData) {
+            userDao = new LocalUserDao();
+            authDao = new LocalAuthTokenDao();
+        }
     }
+
+    public UserService() {
+        this(true);
+    }
+
     public static String generateAuthToken() {
         return UUID.randomUUID().toString();
     }
