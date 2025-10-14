@@ -9,18 +9,17 @@ import org.junit.jupiter.api.Test;
 public class ClearServiceTest {
     private ClearService clearService;
     private UserService userService;
-    private GameDao gameDao;
-    private AuthTokenDao authDao;
-    private UserDao userDao;
+    private GameService gameService;
 
     @BeforeEach
     public void setUp() {
-        userDao = new LocalUserDao();
-        authDao = new LocalAuthTokenDao();
-        gameDao = new LocalGameDao();
+        UserDao userDao = new LocalUserDao();
+        AuthTokenDao authDao = new LocalAuthTokenDao();
+        GameDao gameDao = new LocalGameDao();
 
         clearService = new ClearService(userDao, authDao, gameDao);
         userService = new UserService(userDao, authDao);
+        gameService = new GameService(gameDao);
     }
 
     @Test
@@ -33,4 +32,5 @@ public class ClearServiceTest {
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUser(username));
     }
 
+    // TODO: write clearAuthData() test
 }

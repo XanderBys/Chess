@@ -17,6 +17,7 @@ public class UserService {
         this.userDao = userDao;
         this.authDao = authDao;
     }
+
     public static String generateAuthToken() {
         return UUID.randomUUID().toString();
     }
@@ -24,7 +25,7 @@ public class UserService {
     public RegisterResult register(UserData request) throws AlreadyTakenException {
         UserData userData = userDao.getUserData(request.username());
         if (userData != null) {
-            throw new AlreadyTakenException("Username " + request.username() + " is already taken");
+            throw new AlreadyTakenException("Error: Username " + request.username() + " is already taken");
         }
 
         userDao.createUser(request);
