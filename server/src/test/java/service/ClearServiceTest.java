@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import handlers.RegisterResult;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,13 +24,14 @@ public class ClearServiceTest {
     }
 
     @Test
-    public void clearUserData() {
+    public void clearUserAndAuthData() {
         String username = "ABC";
-        userService.register(new UserData(username, "secure", "abc@123.com"));
+        RegisterResult result = userService.register(new UserData(username, "secure", "abc@123.com"));
 
         clearService.clear();
 
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUser(username));
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUser(result.authData().authToken()));
     }
 
     // TODO: write clearAuthData() test

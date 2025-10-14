@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.AuthTokenDao;
 import dataaccess.LocalAuthTokenDao;
 import dataaccess.LocalUserDao;
 import dataaccess.UserDao;
@@ -20,7 +21,7 @@ public class UserServiceTest {
     @BeforeEach
     public void setUp() {
         UserDao userDao = new LocalUserDao();
-        AuthDao authDao = new LocalAuthTokenDao();
+        AuthTokenDao authDao = new LocalAuthTokenDao();
 
         userService = new UserService(userDao, authDao);
         newUser = new UserData(username, password, email);
