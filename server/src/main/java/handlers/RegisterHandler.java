@@ -23,16 +23,17 @@ public class RegisterHandler extends ChessHandler implements Handler {
             UserData userData = serializer.fromJson(ctx.body(), UserData.class);
 
             RegisterResult result = userService.register(userData);
-            ctx.result(serializer.toJson(result));
+            System.out.println(serializer.toJson(result));
+            ctx.json(serializer.toJson(result));
         } catch (AlreadyTakenException e) {
             ctx.status(403);
-            ctx.result(e.getMessage());
+            ctx.json("{ \"message\": \"Error: already taken\"}");
         } catch (BadRequestException e) {
             ctx.status(400);
-            ctx.result(e.getMessage());
+            ctx.json("{ \"message\": \"Error: bad request\"}");
         } catch (Exception e) {
             ctx.status(500);
-            ctx.result("Server error: " + e.getMessage());
+            ctx.json(String.format("{ \"message\": \"Error: %s\"}", e.getMessage()));
         }
     }
 }

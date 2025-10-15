@@ -32,7 +32,6 @@ public class UserServiceTest {
         RegisterResult result = userService.register(newUser);
 
         Assertions.assertEquals(username, result.username());
-        Assertions.assertEquals(username, result.authData().username());
     }
 
     @Test
@@ -43,7 +42,6 @@ public class UserServiceTest {
             RegisterResult result = userService.register(user);
 
             Assertions.assertEquals(newUsername, result.username());
-            Assertions.assertEquals(newUsername, result.authData().username());
         }
     }
 

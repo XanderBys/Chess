@@ -31,8 +31,6 @@ public class ClearServiceTest {
         clearService.clear();
 
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUser(username));
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUser(result.authData().authToken()));
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUser(result.authToken()));
     }
-
-    // TODO: write clearAuthData() test
 }

@@ -41,7 +41,7 @@ public class UserService {
         AuthData authData = new AuthData(UserService.generateAuthToken(), request.username());
         authDao.createAuth(authData);
 
-        return new RegisterResult(request.username(), authData);
+        return new RegisterResult(request.username(), authData.authToken());
     }
 
     public UserData getUser(String username) throws UserNotFoundException, BadRequestException {
