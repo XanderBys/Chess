@@ -120,7 +120,7 @@ public class UserService {
 
     /**
      * Validates the given authToken and deletes the corresponding auth session
-     * @param authToken
+     * @param authToken for the desired user
      * @throws UnauthorizedException if authToken is not recognized
      * @throws DataAccessException for internal data errors
      */

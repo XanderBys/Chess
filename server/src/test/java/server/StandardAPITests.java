@@ -58,7 +58,7 @@ public class StandardAPITests {
         Assertions.assertEquals(HttpURLConnection.HTTP_OK, serverFacade.getStatusCode(),
                 "server.Server response code was not 200 OK");
         Assertions.assertNotNull(htmlFromServer, "server.Server returned an empty file");
-        Assertions.assertTrue(htmlFromServer.contains("CS 240 Chess server.Server Web API"),
+        Assertions.assertTrue(htmlFromServer.contains("CS 240 Chess Server Web API"),
                 "file returned did not contain an exact match of text from provided index.html");
     }
 
