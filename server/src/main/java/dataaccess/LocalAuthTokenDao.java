@@ -18,6 +18,11 @@ public class LocalAuthTokenDao extends AuthTokenDao {
     }
 
     @Override
+    public void deleteAuth(String authToken) {
+        authorizations.remove(authToken);
+    }
+
+    @Override
     public void clear() {
         authorizations = new HashMap<>();
     }

@@ -11,8 +11,8 @@ import model.UserData;
 import java.util.UUID;
 
 public class UserService {
-    UserDao userDao;
-    AuthTokenDao authDao;
+    private UserDao userDao;
+    private AuthTokenDao authDao;
 
     public UserService(UserDao userDao, AuthTokenDao authDao) {
         this.userDao = userDao;
@@ -75,6 +75,21 @@ public class UserService {
         UserData storedUserData = userDao.getUserData(userToValidate.username());
 
         if (storedUserData == null || !storedUserData.password().equals(userToValidate.password())) {
+            throw new UnauthorizedException("");
+        }
+    }
+
+    public void logout(String authToken) throws UnauthorizedException {
+        validateString(authToken);
+
+        validateAuthData(authToken);
+
+        authDao.deleteAuth(authToken);
+    }
+
+    public void validateAuthData(String authToken) throws UnauthorizedException {
+        AuthData authData = authDao.getAuth(authToken);
+        if (authData == null) {
             throw new UnauthorizedException("");
         }
     }

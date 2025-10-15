@@ -7,5 +7,7 @@ public abstract class AuthTokenDao {
 
     public abstract AuthData getAuth(String authToken);
 
+    public abstract void deleteAuth(String authToken);
+
     public abstract void clear();
 }

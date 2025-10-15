@@ -82,4 +82,22 @@ public class UserServiceTest {
         Assertions.assertThrows(UnauthorizedException.class,
                 () -> userService.login(new LoginRequest(newUser.username(), "passssword")));
     }
+
+    @Test
+    public void logoutNormal() {
+        userService.register(newUser);
+        AuthData authData = userService.login(new LoginRequest(username, password));
+
+        userService.logout(authData.authToken());
+
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.validateAuthData(authData.authToken()));
+    }
+
+    @Test
+    public void logoutUnauthorized() {
+        userService.register(newUser);
+        AuthData authData = userService.login(new LoginRequest(username, password));
+
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout("notavalidauthtoken"));
+    }
 }
