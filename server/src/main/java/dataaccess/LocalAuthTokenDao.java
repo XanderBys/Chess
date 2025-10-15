@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import service.UnauthorizedException;
 
 import java.util.HashMap;
 
@@ -25,5 +26,14 @@ public class LocalAuthTokenDao implements AuthTokenDao {
     @Override
     public void clear() throws DataAccessException {
         authorizations = new HashMap<>();
+    }
+
+    @Override
+    public AuthData validateAuthData(String authToken) throws UnauthorizedException, DataAccessException {
+        AuthData authData = getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("");
+        }
+        return authData;
     }
 }

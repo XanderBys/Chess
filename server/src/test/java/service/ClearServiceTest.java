@@ -20,7 +20,7 @@ public class ClearServiceTest {
 
         clearService = new ClearService(userDao, authDao, gameDao);
         userService = new UserService(userDao, authDao);
-        gameService = new GameService(gameDao);
+        gameService = new GameService(gameDao, authDao);
     }
 
     @Test

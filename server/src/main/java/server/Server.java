@@ -34,7 +34,7 @@ public class Server {
         GameDao gameDao = new LocalGameDao();
 
         userService = new UserService(userDao, authDao);
-        gameService = new GameService(gameDao);
+        gameService = new GameService(gameDao, authDao);
         clearService = new ClearService(userDao, authDao, gameDao);
     }
 

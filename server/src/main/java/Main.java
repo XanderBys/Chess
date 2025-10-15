@@ -12,7 +12,7 @@ public class Main {
             GameDao gameDao = new LocalGameDao();
 
             UserService userService = new UserService(userDao, authDao);
-            GameService gameService = new GameService(gameDao);
+            GameService gameService = new GameService(gameDao, authDao);
             ClearService clearService = new ClearService(userDao, authDao, gameDao);
 
             Server chessServer = new Server(userService, gameService, clearService);

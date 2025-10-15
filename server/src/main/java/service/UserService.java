@@ -11,6 +11,8 @@ import model.UserData;
 
 import java.util.UUID;
 
+import static util.ParameterValidation.validateString;
+
 public class UserService {
     private final UserDao userDao;
     private final AuthTokenDao authDao;
@@ -49,12 +51,6 @@ public class UserService {
         AuthData authData = createAuth(request.username());
 
         return new RegisterResult(request.username(), authData.authToken());
-    }
-
-    private void validateString(Object o) throws BadRequestException {
-        if (o == null || !o.getClass().equals(String.class) || ((String) o).isEmpty()) {
-            throw new BadRequestException("Error: non-empty string expected");
-        }
     }
 
     /**
@@ -127,21 +123,12 @@ public class UserService {
     public void logout(String authToken) throws UnauthorizedException, DataAccessException {
         validateString(authToken);
 
-        validateAuthData(authToken);
+        authDao.validateAuthData(authToken);
 
         authDao.deleteAuth(authToken);
     }
 
-    /**
-     * Checks whether authToken is in the database
-     * @param authToken authToken to validate
-     * @throws UnauthorizedException if authToken not recognized
-     * @throws DataAccessException for internal data errors
-     */
-    public void validateAuthData(String authToken) throws UnauthorizedException, DataAccessException {
-        AuthData authData = authDao.getAuth(authToken);
-        if (authData == null) {
-            throw new UnauthorizedException("");
-        }
+    public void validateAuthData(String authToken) throws UnauthorizedException {
+        authDao.validateAuthData(authToken);
     }
 }
