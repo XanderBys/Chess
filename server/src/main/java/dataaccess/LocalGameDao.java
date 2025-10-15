@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class LocalGameDao implements GameDao {
     private HashMap<Integer, GameData> games = new HashMap<>();
-    private int gameIdCounter = 0;
+    private int gameIdCounter = 1;
 
     @Override
     public int addGame(String gameName) {

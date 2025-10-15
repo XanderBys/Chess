@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import handlers.requests.CreateGameRequest;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +30,7 @@ public class GameServiceTests {
 
     @Test
     public void createGameNormal() {
-        int gameId = gameService.createGame(authToken, "name");
+        int gameId = gameService.createGame(new CreateGameRequest(authToken, "name"));
 
         Assertions.assertNotNull(gameDao.getGameDataById(gameId));
     }

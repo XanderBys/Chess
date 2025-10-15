@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.*;
-import handlers.RegisterResult;
+import handlers.results.RegisterResult;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

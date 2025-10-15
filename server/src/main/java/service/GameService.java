@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
+import handlers.requests.CreateGameRequest;
 import model.GameData;
 
 import java.util.Collection;
@@ -18,7 +19,9 @@ public class GameService {
         this.authDao = authDao;
     }
 
-    public int createGame(String authToken, String gameName) throws UnauthorizedException, DataAccessException {
+    public int createGame(CreateGameRequest request) throws UnauthorizedException, DataAccessException {
+        String authToken = request.authToken();
+        String gameName = request.gameName();
         validateString(authToken);
         validateString(gameName);
 

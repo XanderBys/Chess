@@ -1,30 +1,31 @@
 package handlers;
 
 import com.google.gson.Gson;
-import handlers.requests.LoginRequest;
+import handlers.requests.CreateGameRequest;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import model.AuthData;
 import org.jetbrains.annotations.NotNull;
 import service.BadRequestException;
+import service.GameService;
 import service.UnauthorizedException;
-import service.UserService;
 
-public class LoginHandler extends ChessHandler implements Handler {
-    private final UserService userService;
+public class CreateGameHandler extends ChessHandler implements Handler {
+    private final GameService gameService;
 
-    public LoginHandler(UserService userService) {
-        this.userService = userService;
+    public CreateGameHandler(GameService gameService) {
+        this.gameService = gameService;
     }
 
     @Override
     public void handle(@NotNull Context ctx) {
         try {
             Gson serializer = new Gson();
-            LoginRequest loginData = serializer.fromJson(ctx.body(), LoginRequest.class);
+            String authToken = serializer.fromJson(ctx.header("authorization"), String.class);
+            CreateGameRequest newGame = serializer.fromJson(ctx.body(), CreateGameRequest.class);
+            newGame = newGame.withAuthToken(authToken);
 
-            AuthData result = userService.login(loginData);
-            ctx.json(serializer.toJson(result));
+            int result = gameService.createGame(newGame);
+            ctx.json(String.format("{ \"gameID\": %d}", result));
         } catch (BadRequestException e) {
             ctx.status(400);
             ctx.json("{ \"message\": \"Error: bad request\"}");

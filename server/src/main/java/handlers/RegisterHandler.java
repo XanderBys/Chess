@@ -1,6 +1,7 @@
 package handlers;
 
 import com.google.gson.Gson;
+import handlers.results.RegisterResult;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.UserData;

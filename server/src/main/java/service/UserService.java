@@ -4,8 +4,8 @@ import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.UserDao;
 import dataaccess.UserNotFoundException;
-import handlers.LoginRequest;
-import handlers.RegisterResult;
+import handlers.requests.LoginRequest;
+import handlers.results.RegisterResult;
 import model.AuthData;
 import model.UserData;
 
