@@ -4,7 +4,7 @@ import chess.ChessGame;
 
 import java.util.HashSet;
 
-public class LocalGameDao extends GameDao {
+public class LocalGameDao implements GameDao {
     private HashSet<ChessGame> games = new HashSet<>();
 
     @Override

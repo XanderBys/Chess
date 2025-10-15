@@ -1,5 +1,5 @@
 package dataaccess;
 
-public abstract class GameDao {
+public interface GameDao {
     public abstract void clear();
 }

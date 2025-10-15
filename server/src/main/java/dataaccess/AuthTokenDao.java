@@ -2,12 +2,12 @@ package dataaccess;
 
 import model.AuthData;
 
-public abstract class AuthTokenDao {
-    public abstract void createAuth(AuthData authData);
+public interface AuthTokenDao {
+    public abstract void createAuth(AuthData authData) throws DataAccessException;
 
-    public abstract AuthData getAuth(String authToken);
+    public abstract AuthData getAuth(String authToken) throws DataAccessException;
 
-    public abstract void deleteAuth(String authToken);
+    public abstract void deleteAuth(String authToken) throws DataAccessException;
 
-    public abstract void clear();
+    public abstract void clear() throws DataAccessException;
 }

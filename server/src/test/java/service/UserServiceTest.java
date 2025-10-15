@@ -96,7 +96,7 @@ public class UserServiceTest {
     @Test
     public void logoutUnauthorized() {
         userService.register(newUser);
-        AuthData authData = userService.login(new LoginRequest(username, password));
+        userService.login(new LoginRequest(username, password));
 
         Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout("notavalidauthtoken"));
     }

@@ -4,27 +4,26 @@ import model.UserData;
 
 import java.util.HashMap;
 
-public class LocalUserDao extends UserDao {
+public class LocalUserDao implements UserDao {
     HashMap<String, UserData> users = new HashMap<>();
 
-    // TODO: add DataAccessException here
     @Override
-    public UserData getUserData(String username) {
+    public UserData getUserData(String username) throws DataAccessException {
         return users.get(username);
     }
 
     @Override
-    public UserData getUserData(UserData userData) {
+    public UserData getUserData(UserData userData) throws DataAccessException {
         return users.get(userData.username());
     }
 
     @Override
-    public void createUser(UserData userData) {
+    public void createUser(UserData userData) throws DataAccessException {
         users.put(userData.username(), userData);
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
         users = new HashMap<>();
     }
 }

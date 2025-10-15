@@ -2,12 +2,12 @@ package dataaccess;
 
 import model.UserData;
 
-public abstract class UserDao {
-    public abstract UserData getUserData(String username);
+public interface UserDao {
+    public abstract UserData getUserData(String username) throws DataAccessException;
 
-    public abstract UserData getUserData(UserData userData);
+    public abstract UserData getUserData(UserData userData) throws DataAccessException;
 
-    public abstract void createUser(UserData userData);
+    public abstract void createUser(UserData userData) throws DataAccessException;
 
-    public abstract void clear();
+    public abstract void clear() throws DataAccessException;
 }

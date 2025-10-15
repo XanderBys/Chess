@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthTokenDao;
+import dataaccess.DataAccessException;
 import dataaccess.UserDao;
 import dataaccess.UserNotFoundException;
 import handlers.LoginRequest;
@@ -23,7 +24,8 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    public RegisterResult register(UserData request) throws AlreadyTakenException, BadRequestException {
+    public RegisterResult register(UserData request)
+            throws AlreadyTakenException, BadRequestException, DataAccessException {
         validateString(request.username());
         validateString(request.password());
         validateString(request.email());
@@ -46,14 +48,14 @@ public class UserService {
         }
     }
 
-    private AuthData createAuth(String username) {
+    private AuthData createAuth(String username) throws DataAccessException {
         AuthData authData = new AuthData(username, UserService.generateAuthToken());
         authDao.createAuth(authData);
 
         return authData;
     }
 
-    public UserData getUser(String username) throws UserNotFoundException {
+    public UserData getUser(String username) throws UserNotFoundException, DataAccessException {
         UserData data = userDao.getUserData(username);
         if (data == null) {
             throw new UserNotFoundException(username);
@@ -62,7 +64,8 @@ public class UserService {
         return data;
     }
 
-    public AuthData login(LoginRequest request) throws BadRequestException, UnauthorizedException {
+    public AuthData login(LoginRequest request)
+            throws BadRequestException, UnauthorizedException, DataAccessException {
         validateString(request.username());
         validateString(request.password());
 
@@ -71,7 +74,7 @@ public class UserService {
         return createAuth(request.username());
     }
 
-    private void validateLoginData(LoginRequest userToValidate) throws UnauthorizedException {
+    private void validateLoginData(LoginRequest userToValidate) throws UnauthorizedException, DataAccessException {
         UserData storedUserData = userDao.getUserData(userToValidate.username());
 
         if (storedUserData == null || !storedUserData.password().equals(userToValidate.password())) {
@@ -79,7 +82,7 @@ public class UserService {
         }
     }
 
-    public void logout(String authToken) throws UnauthorizedException {
+    public void logout(String authToken) throws UnauthorizedException, DataAccessException {
         validateString(authToken);
 
         validateAuthData(authToken);
@@ -87,7 +90,7 @@ public class UserService {
         authDao.deleteAuth(authToken);
     }
 
-    public void validateAuthData(String authToken) throws UnauthorizedException {
+    public void validateAuthData(String authToken) throws UnauthorizedException, DataAccessException {
         AuthData authData = authDao.getAuth(authToken);
         if (authData == null) {
             throw new UnauthorizedException("");
