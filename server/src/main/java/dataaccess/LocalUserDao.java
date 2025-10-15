@@ -13,11 +13,6 @@ public class LocalUserDao implements UserDao {
     }
 
     @Override
-    public UserData getUserData(UserData userData) throws DataAccessException {
-        return users.get(userData.username());
-    }
-
-    @Override
     public void createUser(UserData userData) throws DataAccessException {
         users.put(userData.username(), userData);
     }

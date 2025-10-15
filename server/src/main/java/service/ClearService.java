@@ -19,7 +19,7 @@ public class ClearService {
     /**
      * Deletes all data in each of the 3 DAOs
      *
-     * @throws DataAccessException
+     * @throws DataAccessException for internal data errors
      */
     public void clear() throws DataAccessException {
         userDao.clear();
