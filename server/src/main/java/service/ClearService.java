@@ -16,6 +16,11 @@ public class ClearService {
         this.gameDao = gameDao;
     }
 
+    /**
+     * Deletes all data in each of the 3 DAOs
+     *
+     * @throws DataAccessException
+     */
     public void clear() throws DataAccessException {
         userDao.clear();
         authDao.clear();

@@ -24,6 +24,15 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
+    /**
+     * Validates request parameters and creates a new user in the DAO.
+     *
+     * @param request instance of UserData
+     * @return an instance of AuthData
+     * @throws AlreadyTakenException if username is already taken
+     * @throws BadRequestException   if any of the strings in request are invalid
+     * @throws DataAccessException   for internal data errors
+     */
     public RegisterResult register(UserData request)
             throws AlreadyTakenException, BadRequestException, DataAccessException {
         validateString(request.username());
@@ -48,6 +57,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Creates an instance of AuthData in data storage
+     * @param username the username of the user whose auth session is starting
+     * @return the created instance of AuthData
+     * @throws DataAccessException
+     */
     private AuthData createAuth(String username) throws DataAccessException {
         AuthData authData = new AuthData(username, UserService.generateAuthToken());
         authDao.createAuth(authData);
@@ -55,6 +70,13 @@ public class UserService {
         return authData;
     }
 
+    /**
+     * Get the stored data about a user
+     * @param username of the user whose data to retrieve
+     * @return an instance of UserData
+     * @throws UserNotFoundException if username is not in the database
+     * @throws DataAccessException
+     */
     public UserData getUser(String username) throws UserNotFoundException, DataAccessException {
         UserData data = userDao.getUserData(username);
         if (data == null) {
@@ -64,6 +86,14 @@ public class UserService {
         return data;
     }
 
+    /**
+     * Validates request and creates a new auth session for user
+     * @param request an instance of LoginRequest
+     * @return an instance of AuthData
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     * @throws DataAccessException
+     */
     public AuthData login(LoginRequest request)
             throws BadRequestException, UnauthorizedException, DataAccessException {
         validateString(request.username());
@@ -74,6 +104,12 @@ public class UserService {
         return createAuth(request.username());
     }
 
+    /**
+     * Checks that user is registered and that username and password match
+     * @param userToValidate an instance of LoginRequest containing username and password
+     * @throws UnauthorizedException if the password doesn't match username or if username is null
+     * @throws DataAccessException
+     */
     private void validateLoginData(LoginRequest userToValidate) throws UnauthorizedException, DataAccessException {
         UserData storedUserData = userDao.getUserData(userToValidate.username());
 
@@ -82,6 +118,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Validates the given authToken and deletes the corresponding auth session
+     * @param authToken
+     * @throws UnauthorizedException if authToken is not recognized
+     * @throws DataAccessException
+     */
     public void logout(String authToken) throws UnauthorizedException, DataAccessException {
         validateString(authToken);
 
@@ -90,6 +132,12 @@ public class UserService {
         authDao.deleteAuth(authToken);
     }
 
+    /**
+     * Checks whether authToken is in the database
+     * @param authToken
+     * @throws UnauthorizedException
+     * @throws DataAccessException
+     */
     public void validateAuthData(String authToken) throws UnauthorizedException, DataAccessException {
         AuthData authData = authDao.getAuth(authToken);
         if (authData == null) {
