@@ -1,6 +1,12 @@
 package service;
 
+import dataaccess.AuthTokenDao;
+import dataaccess.LocalAuthTokenDao;
+import dataaccess.LocalUserDao;
+import dataaccess.UserDao;
+import handlers.LoginRequest;
 import handlers.RegisterResult;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +22,10 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userService = new UserService();
+        UserDao userDao = new LocalUserDao();
+        AuthTokenDao authDao = new LocalAuthTokenDao();
+
+        userService = new UserService(userDao, authDao);
         newUser = new UserData(username, password, email);
     }
 
@@ -25,7 +34,6 @@ public class UserServiceTest {
         RegisterResult result = userService.register(newUser);
 
         Assertions.assertEquals(username, result.username());
-        Assertions.assertEquals(username, result.authData().username());
     }
 
     @Test
@@ -36,7 +44,6 @@ public class UserServiceTest {
             RegisterResult result = userService.register(user);
 
             Assertions.assertEquals(newUsername, result.username());
-            Assertions.assertEquals(newUsername, result.authData().username());
         }
     }
 
@@ -49,5 +56,48 @@ public class UserServiceTest {
 
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(identicalUser));
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(sameUsername));
+    }
+
+    @Test
+    public void normalLogin() {
+        userService.register(newUser);
+
+        AuthData loginData = userService.login(new LoginRequest(newUser.username(), newUser.password()));
+
+        Assertions.assertEquals(loginData.username(), newUser.username());
+        Assertions.assertNotNull(loginData.authToken());
+    }
+
+    @Test
+    public void loginNoUsername() {
+        userService.register(newUser);
+
+        Assertions.assertThrows(BadRequestException.class, () -> userService.login(new LoginRequest("", newUser.password())));
+    }
+
+    @Test
+    public void loginInvalidCredentials() {
+        userService.register(newUser);
+
+        Assertions.assertThrows(UnauthorizedException.class,
+                () -> userService.login(new LoginRequest(newUser.username(), "passssword")));
+    }
+
+    @Test
+    public void logoutNormal() {
+        userService.register(newUser);
+        AuthData authData = userService.login(new LoginRequest(username, password));
+
+        userService.logout(authData.authToken());
+
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.validateAuthData(authData.authToken()));
+    }
+
+    @Test
+    public void logoutUnauthorized() {
+        userService.register(newUser);
+        userService.login(new LoginRequest(username, password));
+
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout("notavalidauthtoken"));
     }
 }

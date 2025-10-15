@@ -1,6 +1,4 @@
 package handlers;
 
-import model.AuthData;
-
-public record RegisterResult(String username, AuthData authData) {
+public record RegisterResult(String username, String authToken) {
 }

@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthTokenDao;
+import dataaccess.DataAccessException;
 import dataaccess.GameDao;
 import dataaccess.UserDao;
 
@@ -9,13 +10,18 @@ public class ClearService {
     AuthTokenDao authDao;
     GameDao gameDao;
 
-    ClearService(UserDao userDao, AuthTokenDao authDao, GameDao gameDao) {
+    public ClearService(UserDao userDao, AuthTokenDao authDao, GameDao gameDao) {
         this.userDao = userDao;
         this.authDao = authDao;
         this.gameDao = gameDao;
     }
 
-    public void clear() {
+    /**
+     * Deletes all data in each of the 3 DAOs
+     *
+     * @throws DataAccessException for internal data errors
+     */
+    public void clear() throws DataAccessException {
         userDao.clear();
         authDao.clear();
         gameDao.clear();
