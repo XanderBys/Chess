@@ -18,7 +18,7 @@ public class ClearHandler extends ChessHandler implements Handler {
             clearService.clear();
         } catch (Exception e) {
             ctx.status(500);
-            ctx.result("server.Server error: " + e.getMessage());
+            ctx.json(String.format("{\"message\": \"Error: %s\"}", e.getMessage()));
         }
     }
 }

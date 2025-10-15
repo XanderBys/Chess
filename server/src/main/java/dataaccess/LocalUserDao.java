@@ -14,6 +14,11 @@ public class LocalUserDao extends UserDao {
     }
 
     @Override
+    public UserData getUserData(UserData userData) {
+        return users.get(userData.username());
+    }
+
+    @Override
     public void createUser(UserData userData) {
         users.put(userData.username(), userData);
     }

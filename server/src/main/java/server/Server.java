@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.*;
 import handlers.ClearHandler;
+import handlers.LoginHandler;
 import handlers.RegisterHandler;
 import io.javalin.Javalin;
 import service.ClearService;
@@ -47,6 +48,7 @@ public class Server {
     private void createHandlers() {
         javalin.post("/user", new RegisterHandler(userService));
         javalin.delete("/db", new ClearHandler(clearService));
+        javalin.post("/session", new LoginHandler(userService));
     }
 
     public void stop() {

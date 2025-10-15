@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthTokenDao;
 import dataaccess.UserDao;
 import dataaccess.UserNotFoundException;
+import handlers.LoginRequest;
 import handlers.RegisterResult;
 import model.AuthData;
 import model.UserData;
@@ -22,14 +23,10 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    public RegisterResult register(UserData request) throws AlreadyTakenException {
-        if (request.username() == null || request.username().isEmpty()) {
-            throw new BadRequestException("Error: username is a required field");
-        } else if (request.password() == null || request.password().isEmpty()) {
-            throw new BadRequestException("Error: password is a required field");
-        } else if (request.email() == null || request.email().isEmpty()) {
-            throw new BadRequestException("Error: email is a required field");
-        }
+    public RegisterResult register(UserData request) throws AlreadyTakenException, BadRequestException {
+        validateString(request.username());
+        validateString(request.password());
+        validateString(request.email());
 
         UserData userData = userDao.getUserData(request.username());
         if (userData != null) {
@@ -38,18 +35,47 @@ public class UserService {
 
         userDao.createUser(request);
 
-        AuthData authData = new AuthData(UserService.generateAuthToken(), request.username());
-        authDao.createAuth(authData);
+        AuthData authData = createAuth(request.username());
 
         return new RegisterResult(request.username(), authData.authToken());
     }
 
-    public UserData getUser(String username) throws UserNotFoundException, BadRequestException {
+    private void validateString(Object o) throws BadRequestException {
+        if (o == null || !o.getClass().equals(String.class) || ((String) o).isEmpty()) {
+            throw new BadRequestException("Error: non-empty string expected");
+        }
+    }
+
+    private AuthData createAuth(String username) {
+        AuthData authData = new AuthData(username, UserService.generateAuthToken());
+        authDao.createAuth(authData);
+
+        return authData;
+    }
+
+    public UserData getUser(String username) throws UserNotFoundException {
         UserData data = userDao.getUserData(username);
         if (data == null) {
             throw new UserNotFoundException(username);
         }
 
         return data;
+    }
+
+    public AuthData login(LoginRequest request) throws BadRequestException, UnauthorizedException {
+        validateString(request.username());
+        validateString(request.password());
+
+        validateLoginData(request);
+
+        return createAuth(request.username());
+    }
+
+    private void validateLoginData(LoginRequest userToValidate) throws UnauthorizedException {
+        UserData storedUserData = userDao.getUserData(userToValidate.username());
+
+        if (storedUserData == null || !storedUserData.password().equals(userToValidate.password())) {
+            throw new UnauthorizedException("");
+        }
     }
 }

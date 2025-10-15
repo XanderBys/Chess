@@ -4,7 +4,9 @@ import dataaccess.AuthTokenDao;
 import dataaccess.LocalAuthTokenDao;
 import dataaccess.LocalUserDao;
 import dataaccess.UserDao;
+import handlers.LoginRequest;
 import handlers.RegisterResult;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,5 +56,30 @@ public class UserServiceTest {
 
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(identicalUser));
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(sameUsername));
+    }
+
+    @Test
+    public void normalLogin() {
+        userService.register(newUser);
+
+        AuthData loginData = userService.login(new LoginRequest(newUser.username(), newUser.password()));
+
+        Assertions.assertEquals(loginData.username(), newUser.username());
+        Assertions.assertNotNull(loginData.authToken());
+    }
+
+    @Test
+    public void loginNoUsername() {
+        userService.register(newUser);
+
+        Assertions.assertThrows(BadRequestException.class, () -> userService.login(new LoginRequest("", newUser.password())));
+    }
+
+    @Test
+    public void loginInvalidCredentials() {
+        userService.register(newUser);
+
+        Assertions.assertThrows(UnauthorizedException.class,
+                () -> userService.login(new LoginRequest(newUser.username(), "passssword")));
     }
 }
