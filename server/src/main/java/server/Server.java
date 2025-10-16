@@ -52,6 +52,7 @@ public class Server {
         javalin.delete("/session", new LogoutHandler(userService));
 
         javalin.post("/game", new CreateGameHandler(gameService));
+        javalin.get("/game", new ListGamesHandler(gameService));
     }
 
     public void stop() {

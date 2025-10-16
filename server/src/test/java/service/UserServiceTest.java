@@ -29,6 +29,9 @@ public class UserServiceTest {
         newUser = new UserData(username, password, email);
     }
 
+    /**
+     * Positive test for register service
+     */
     @Test
     public void registerUser() {
         RegisterResult result = userService.register(newUser);
@@ -36,6 +39,9 @@ public class UserServiceTest {
         Assertions.assertEquals(username, result.username());
     }
 
+    /**
+     * positive test for register service
+     */
     @Test
     public void registerMultipleUsers() {
         for (int i = 0; i < 100; i++) {
@@ -47,6 +53,9 @@ public class UserServiceTest {
         }
     }
 
+    /**
+     * negative test for register service
+     */
     @Test
     public void usernameTaken() {
         userService.register(newUser);
@@ -58,6 +67,9 @@ public class UserServiceTest {
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(sameUsername));
     }
 
+    /**
+     * positive test for login service
+     */
     @Test
     public void normalLogin() {
         userService.register(newUser);
@@ -68,6 +80,10 @@ public class UserServiceTest {
         Assertions.assertNotNull(loginData.authToken());
     }
 
+
+    /**
+     * negative test for login service
+     */
     @Test
     public void loginNoUsername() {
         userService.register(newUser);
@@ -75,6 +91,9 @@ public class UserServiceTest {
         Assertions.assertThrows(BadRequestException.class, () -> userService.login(new LoginRequest("", newUser.password())));
     }
 
+    /**
+     * negative test for login service
+     */
     @Test
     public void loginInvalidCredentials() {
         userService.register(newUser);
@@ -83,6 +102,9 @@ public class UserServiceTest {
                 () -> userService.login(new LoginRequest(newUser.username(), "passssword")));
     }
 
+    /**
+     * positive test for logout service
+     */
     @Test
     public void logoutNormal() {
         userService.register(newUser);
@@ -93,6 +115,9 @@ public class UserServiceTest {
         Assertions.assertThrows(UnauthorizedException.class, () -> userService.validateAuthData(authData.authToken()));
     }
 
+    /**
+     * negative test for logout service
+     */
     @Test
     public void logoutUnauthorized() {
         userService.register(newUser);
