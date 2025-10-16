@@ -12,6 +12,7 @@ import model.GameData;
 import java.util.Collection;
 
 import static util.ParameterValidation.validateString;
+import static util.ParameterValidation.validateTeamColor;
 
 public class GameService {
     private final GameDao gameDao;
@@ -44,16 +45,18 @@ public class GameService {
     public void joinGame(JoinGameRequest request)
             throws UnauthorizedException, DataAccessException, AlreadyTakenException {
         validateString(request.authToken());
+        validateTeamColor(request.playerColor());
+
         AuthData authData = authDao.validateAuthData(request.authToken());
 
-        GameData gameData = gameDao.getGameDataById(request.gameId());
+        GameData gameData = gameDao.getGameDataById(request.gameID());
         if (gameData == null) {
-            throw new BadRequestException(String.format("Game with id %d does not exist", request.gameId()));
+            throw new BadRequestException(String.format("Game with id %d does not exist", request.gameID()));
         }
 
         checkIfPlayerColorIsOccupied(request, gameData);
 
-        gameDao.replaceGame(request.gameId(), gameData.addUser(request.playerColor(), authData.username()));
+        gameDao.replaceGame(request.gameID(), gameData.addUser(request.playerColor(), authData.username()));
     }
 
     private void checkIfPlayerColorIsOccupied(JoinGameRequest request, GameData gameData) throws AlreadyTakenException {

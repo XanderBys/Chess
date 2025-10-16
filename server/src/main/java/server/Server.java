@@ -53,6 +53,7 @@ public class Server {
 
         javalin.post("/game", new CreateGameHandler(gameService));
         javalin.get("/game", new ListGamesHandler(gameService));
+        javalin.put("/game", new JoinGameHandler(gameService));
     }
 
     public void stop() {
