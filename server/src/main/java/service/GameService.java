@@ -1,9 +1,12 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
 import handlers.requests.CreateGameRequest;
+import handlers.requests.JoinGameRequest;
+import model.AuthData;
 import model.GameData;
 
 import java.util.Collection;
@@ -30,11 +33,36 @@ public class GameService {
         return gameDao.addGame(gameName);
     }
 
-    public Collection<GameData> listGames(String authToken) {
+    public Collection<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
         validateString(authToken);
 
         authDao.validateAuthData(authToken);
 
         return gameDao.listCurrentGames();
     }
+
+    public void joinGame(JoinGameRequest request)
+            throws UnauthorizedException, DataAccessException, AlreadyTakenException {
+        validateString(request.authToken());
+        AuthData authData = authDao.validateAuthData(request.authToken());
+
+        GameData gameData = gameDao.getGameDataById(request.gameId());
+        if (gameData == null) {
+            throw new BadRequestException(String.format("Game with id %d does not exist", request.gameId()));
+        }
+
+        checkIfPlayerColorIsOccupied(request, gameData);
+
+        gameDao.replaceGame(request.gameId(), gameData.addUser(request.playerColor(), authData.username()));
+    }
+
+    private void checkIfPlayerColorIsOccupied(JoinGameRequest request, GameData gameData) throws AlreadyTakenException {
+        if (request.playerColor() == ChessGame.TeamColor.WHITE && gameData.whiteUsername() != null) {
+            throw new AlreadyTakenException("White is already taken");
+        } else if (request.playerColor() == ChessGame.TeamColor.BLACK && gameData.blackUsername() != null) {
+            throw new AlreadyTakenException("Black is already taken");
+        }
+    }
+
+
 }
