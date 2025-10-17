@@ -3,7 +3,6 @@ package service;
 import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.UserDao;
-import dataaccess.UserNotFoundException;
 import handlers.requests.LoginRequest;
 import handlers.results.RegisterResult;
 import model.AuthData;
@@ -22,7 +21,7 @@ public class UserService {
         this.authDao = authDao;
     }
 
-    public static String generateAuthToken() {
+    private static String generateAuthToken() {
         return UUID.randomUUID().toString();
     }
 
@@ -64,22 +63,6 @@ public class UserService {
         authDao.createAuth(authData);
 
         return authData;
-    }
-
-    /**
-     * Get the stored data about a user
-     * @param username of the user whose data to retrieve
-     * @return an instance of UserData
-     * @throws UserNotFoundException if username is not in the database
-     * @throws DataAccessException for internal data errors
-     */
-    public UserData getUser(String username) throws UserNotFoundException, DataAccessException {
-        UserData data = userDao.getUserData(username);
-        if (data == null) {
-            throw new UserNotFoundException(username);
-        }
-
-        return data;
     }
 
     /**
@@ -126,9 +109,5 @@ public class UserService {
         authDao.validateAuthData(authToken);
 
         authDao.deleteAuth(authToken);
-    }
-
-    public void validateAuthData(String authToken) throws UnauthorizedException {
-        authDao.validateAuthData(authToken);
     }
 }

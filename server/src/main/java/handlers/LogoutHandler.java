@@ -1,6 +1,5 @@
 package handlers;
 
-import com.google.gson.Gson;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
@@ -17,9 +16,7 @@ public class LogoutHandler implements Handler {
     @Override
     public void handle(@NotNull Context ctx) {
         try {
-            Gson serializer = new Gson();
             String authToken = ctx.header("authorization");
-
             userService.logout(authToken);
         } catch (UnauthorizedException e) {
             ctx.status(401);

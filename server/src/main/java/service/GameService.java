@@ -87,7 +87,7 @@ public class GameService {
      *
      * @param color    the TeamColor that was requested
      * @param gameData the data for the game being played
-     * @throws AlreadyTakenException
+     * @throws AlreadyTakenException if 'color' is already being played by another user
      */
     private void checkIfPlayerColorIsOccupied(ChessGame.TeamColor color, GameData gameData) throws AlreadyTakenException {
         if (color == ChessGame.TeamColor.WHITE && gameData.whiteUsername() != null) {

@@ -20,10 +20,12 @@ public class UserServiceTest {
     private final String email = "abc@gmail.com";
     private UserData newUser;
 
+    private AuthTokenDao authDao;
+
     @BeforeEach
     public void setUp() {
         UserDao userDao = new LocalUserDao();
-        AuthTokenDao authDao = new LocalAuthTokenDao();
+        authDao = new LocalAuthTokenDao();
 
         userService = new UserService(userDao, authDao);
         newUser = new UserData(username, password, email);
@@ -112,7 +114,7 @@ public class UserServiceTest {
 
         userService.logout(authData.authToken());
 
-        Assertions.assertThrows(UnauthorizedException.class, () -> userService.validateAuthData(authData.authToken()));
+        Assertions.assertThrows(UnauthorizedException.class, () -> authDao.validateAuthData(authData.authToken()));
     }
 
     /**
