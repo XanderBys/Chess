@@ -10,7 +10,7 @@ import service.UnauthorizedException;
 
 import java.util.Collection;
 
-public class ListGamesHandler extends ChessHandler implements Handler {
+public class ListGamesHandler implements Handler {
     private final GameService gameService;
 
     public ListGamesHandler(GameService gameService) {
@@ -21,7 +21,7 @@ public class ListGamesHandler extends ChessHandler implements Handler {
     public void handle(@NotNull Context ctx) {
         try {
             Gson serializer = new Gson();
-            String authToken = serializer.fromJson(ctx.header("authorization"), String.class);
+            String authToken = ctx.header("authorization");
 
             Collection<GameData> gameList = gameService.listGames(authToken);
             String serializedGameList = serializer.toJson(gameList);

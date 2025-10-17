@@ -10,7 +10,7 @@ import service.BadRequestException;
 import service.UnauthorizedException;
 import service.UserService;
 
-public class LoginHandler extends ChessHandler implements Handler {
+public class LoginHandler implements Handler {
     private final UserService userService;
 
     public LoginHandler(UserService userService) {

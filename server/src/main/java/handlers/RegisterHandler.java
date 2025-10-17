@@ -10,7 +10,7 @@ import service.AlreadyTakenException;
 import service.BadRequestException;
 import service.UserService;
 
-public class RegisterHandler extends ChessHandler implements Handler {
+public class RegisterHandler implements Handler {
     private final UserService userService;
 
     public RegisterHandler(UserService userService) {

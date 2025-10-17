@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import service.UnauthorizedException;
 import service.UserService;
 
-public class LogoutHandler extends ChessHandler implements Handler {
+public class LogoutHandler implements Handler {
     private final UserService userService;
 
     public LogoutHandler(UserService userService) {
@@ -18,7 +18,7 @@ public class LogoutHandler extends ChessHandler implements Handler {
     public void handle(@NotNull Context ctx) {
         try {
             Gson serializer = new Gson();
-            String authToken = serializer.fromJson(ctx.header("authorization"), String.class);
+            String authToken = ctx.header("authorization");
 
             userService.logout(authToken);
         } catch (UnauthorizedException e) {

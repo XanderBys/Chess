@@ -9,7 +9,7 @@ import service.BadRequestException;
 import service.GameService;
 import service.UnauthorizedException;
 
-public class CreateGameHandler extends ChessHandler implements Handler {
+public class CreateGameHandler implements Handler {
     private final GameService gameService;
 
     public CreateGameHandler(GameService gameService) {
@@ -20,7 +20,7 @@ public class CreateGameHandler extends ChessHandler implements Handler {
     public void handle(@NotNull Context ctx) {
         try {
             Gson serializer = new Gson();
-            String authToken = serializer.fromJson(ctx.header("authorization"), String.class);
+            String authToken = ctx.header("authorization");
             CreateGameRequest newGame = serializer.fromJson(ctx.body(), CreateGameRequest.class);
             newGame = newGame.withAuthToken(authToken);
 

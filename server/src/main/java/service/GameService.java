@@ -23,6 +23,14 @@ public class GameService {
         this.authDao = authDao;
     }
 
+    /**
+     * creates a new game and stores it in the database
+     *
+     * @param request contains an auth token and game name (both strings)
+     * @return the id of the created game
+     * @throws UnauthorizedException if authToken is invalid
+     * @throws DataAccessException   for internal errors
+     */
     public int createGame(CreateGameRequest request) throws UnauthorizedException, DataAccessException {
         String authToken = request.authToken();
         String gameName = request.gameName();
@@ -34,6 +42,13 @@ public class GameService {
         return gameDao.addGame(gameName);
     }
 
+    /**
+     * Gets a list of all current games on the server
+     * @param authToken a String representing the user's session
+     * @return a Collection of GameData instances representing all current games
+     * @throws UnauthorizedException if authToken is invalid
+     * @throws DataAccessException for database errors
+     */
     public Collection<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
         validateString(authToken);
 
@@ -42,6 +57,14 @@ public class GameService {
         return gameDao.listCurrentGames();
     }
 
+    /**
+     * Adds a user to the requested game
+     * @param request object containing an auth token, the name of the color that the user will play, and the
+     *                id of the game to be joined
+     * @throws UnauthorizedException if request.authToken() is invalid
+     * @throws DataAccessException for database errors
+     * @throws AlreadyTakenException if the requested color is already being played by a different user
+     */
     public void joinGame(JoinGameRequest request)
             throws UnauthorizedException, DataAccessException, AlreadyTakenException {
         validateString(request.authToken());
@@ -54,15 +77,22 @@ public class GameService {
             throw new BadRequestException(String.format("Game with id %d does not exist", request.gameID()));
         }
 
-        checkIfPlayerColorIsOccupied(request, gameData);
+        checkIfPlayerColorIsOccupied(request.playerColor(), gameData);
 
         gameDao.replaceGame(request.gameID(), gameData.addUser(request.playerColor(), authData.username()));
     }
 
-    private void checkIfPlayerColorIsOccupied(JoinGameRequest request, GameData gameData) throws AlreadyTakenException {
-        if (request.playerColor() == ChessGame.TeamColor.WHITE && gameData.whiteUsername() != null) {
+    /**
+     * Checks if the given color is occupied
+     *
+     * @param color    the TeamColor that was requested
+     * @param gameData the data for the game being played
+     * @throws AlreadyTakenException
+     */
+    private void checkIfPlayerColorIsOccupied(ChessGame.TeamColor color, GameData gameData) throws AlreadyTakenException {
+        if (color == ChessGame.TeamColor.WHITE && gameData.whiteUsername() != null) {
             throw new AlreadyTakenException("White is already taken");
-        } else if (request.playerColor() == ChessGame.TeamColor.BLACK && gameData.blackUsername() != null) {
+        } else if (color == ChessGame.TeamColor.BLACK && gameData.blackUsername() != null) {
             throw new AlreadyTakenException("Black is already taken");
         }
     }
