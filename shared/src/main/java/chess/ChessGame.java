@@ -237,7 +237,7 @@ public class ChessGame {
                     return false;
                 }
                 for (int i = move.getStartPosition().getColumn()+1; i < move.getEndPosition().getColumn(); i++){
-                    ChessMove newMove = new ChessMove(move.getStartPosition(), new ChessPosition(move.getStartPosition().getRow(), i));
+                    ChessMove newMove = generateNewMove(move, i);
                     if (moveCausesCheck(board, newMove) || board.getPiece(move.getEndPosition()) != null) {
                         return false;
                     }
@@ -251,7 +251,7 @@ public class ChessGame {
                     return false;
                 }
                 for (int i = move.getStartPosition().getColumn()-1; i > move.getEndPosition().getColumn(); i--){
-                    ChessMove newMove = new ChessMove(move.getStartPosition(), new ChessPosition(move.getStartPosition().getRow(), i));
+                    ChessMove newMove = generateNewMove(move, i);
                     if (moveCausesCheck(board, newMove) || board.getPiece(move.getEndPosition()) != null) {
                         return false;
                     }
@@ -263,6 +263,10 @@ public class ChessGame {
             return false;
         }
         return !moveCausesCheck(board, move);
+    }
+
+    ChessMove generateNewMove(ChessMove move, int i) {
+        return new ChessMove(move.getStartPosition(), new ChessPosition(move.getStartPosition().getRow(), i));
     }
 
     private boolean moveCausesCheck(ChessBoard board, ChessMove move){
