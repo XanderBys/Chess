@@ -4,8 +4,8 @@ import dataaccess.AuthTokenDao;
 import dataaccess.LocalAuthTokenDao;
 import dataaccess.LocalUserDao;
 import dataaccess.UserDao;
-import handlers.LoginRequest;
-import handlers.RegisterResult;
+import handlers.requests.LoginRequest;
+import handlers.results.RegisterResult;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
@@ -20,15 +20,20 @@ public class UserServiceTest {
     private final String email = "abc@gmail.com";
     private UserData newUser;
 
+    private AuthTokenDao authDao;
+
     @BeforeEach
     public void setUp() {
         UserDao userDao = new LocalUserDao();
-        AuthTokenDao authDao = new LocalAuthTokenDao();
+        authDao = new LocalAuthTokenDao();
 
         userService = new UserService(userDao, authDao);
         newUser = new UserData(username, password, email);
     }
 
+    /**
+     * Positive test for register service
+     */
     @Test
     public void registerUser() {
         RegisterResult result = userService.register(newUser);
@@ -36,6 +41,9 @@ public class UserServiceTest {
         Assertions.assertEquals(username, result.username());
     }
 
+    /**
+     * positive test for register service
+     */
     @Test
     public void registerMultipleUsers() {
         for (int i = 0; i < 100; i++) {
@@ -47,6 +55,9 @@ public class UserServiceTest {
         }
     }
 
+    /**
+     * negative test for register service
+     */
     @Test
     public void usernameTaken() {
         userService.register(newUser);
@@ -58,6 +69,9 @@ public class UserServiceTest {
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(sameUsername));
     }
 
+    /**
+     * positive test for login service
+     */
     @Test
     public void normalLogin() {
         userService.register(newUser);
@@ -68,6 +82,10 @@ public class UserServiceTest {
         Assertions.assertNotNull(loginData.authToken());
     }
 
+
+    /**
+     * negative test for login service
+     */
     @Test
     public void loginNoUsername() {
         userService.register(newUser);
@@ -75,6 +93,9 @@ public class UserServiceTest {
         Assertions.assertThrows(BadRequestException.class, () -> userService.login(new LoginRequest("", newUser.password())));
     }
 
+    /**
+     * negative test for login service
+     */
     @Test
     public void loginInvalidCredentials() {
         userService.register(newUser);
@@ -83,6 +104,9 @@ public class UserServiceTest {
                 () -> userService.login(new LoginRequest(newUser.username(), "passssword")));
     }
 
+    /**
+     * positive test for logout service
+     */
     @Test
     public void logoutNormal() {
         userService.register(newUser);
@@ -90,9 +114,12 @@ public class UserServiceTest {
 
         userService.logout(authData.authToken());
 
-        Assertions.assertThrows(UnauthorizedException.class, () -> userService.validateAuthData(authData.authToken()));
+        Assertions.assertThrows(UnauthorizedException.class, () -> authDao.validateAuthData(authData.authToken()));
     }
 
+    /**
+     * negative test for logout service
+     */
     @Test
     public void logoutUnauthorized() {
         userService.register(newUser);

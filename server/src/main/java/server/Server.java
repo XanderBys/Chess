@@ -1,10 +1,7 @@
 package server;
 
 import dataaccess.*;
-import handlers.ClearHandler;
-import handlers.LoginHandler;
-import handlers.LogoutHandler;
-import handlers.RegisterHandler;
+import handlers.*;
 import io.javalin.Javalin;
 import service.ClearService;
 import service.GameService;
@@ -18,6 +15,13 @@ public class Server {
     private GameService gameService;
     private ClearService clearService;
 
+    /**
+     * Creates a new instance of Server given instances of each of the service classes
+     *
+     * @param userService  an instance of UserService to be used by the server
+     * @param gameService  an instance of GameService to be used by the server
+     * @param clearService an instance of ClearService to be used by the server
+     */
     public Server(UserService userService, GameService gameService, ClearService clearService) {
         this.userService = userService;
         this.gameService = gameService;
@@ -26,6 +30,9 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
     }
 
+    /**
+     * Creates an instance of Server without pre-instantiated versions of service classes.
+     */
     public Server() {
         this(null, null, null);
 
@@ -38,6 +45,12 @@ public class Server {
         clearService = new ClearService(userDao, authDao, gameDao);
     }
 
+    /**
+     * Starts the server
+     *
+     * @param desiredPort the port for the server to run on. If 0, the server starts on any availabe port.
+     * @return the port the server started on
+     */
     public int run(int desiredPort) {
         createHandlers();
 
@@ -53,6 +66,10 @@ public class Server {
 
         javalin.post("/session", new LoginHandler(userService));
         javalin.delete("/session", new LogoutHandler(userService));
+
+        javalin.post("/game", new CreateGameHandler(gameService));
+        javalin.get("/game", new ListGamesHandler(gameService));
+        javalin.put("/game", new JoinGameHandler(gameService));
     }
 
     public void stop() {

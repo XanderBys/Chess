@@ -1,36 +1,40 @@
 package handlers;
 
 import com.google.gson.Gson;
-import handlers.requests.LoginRequest;
+import handlers.requests.JoinGameRequest;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import model.AuthData;
 import org.jetbrains.annotations.NotNull;
+import service.AlreadyTakenException;
 import service.BadRequestException;
+import service.GameService;
 import service.UnauthorizedException;
-import service.UserService;
 
-public class LoginHandler implements Handler {
-    private final UserService userService;
+public class JoinGameHandler implements Handler {
+    private final GameService gameService;
 
-    public LoginHandler(UserService userService) {
-        this.userService = userService;
+    public JoinGameHandler(GameService gameService) {
+        this.gameService = gameService;
     }
 
     @Override
     public void handle(@NotNull Context ctx) {
         try {
             Gson serializer = new Gson();
-            LoginRequest loginData = serializer.fromJson(ctx.body(), LoginRequest.class);
+            String authToken = ctx.header("authorization");
+            JoinGameRequest request = serializer.fromJson(ctx.body(), JoinGameRequest.class);
+            request = request.withAuthToken(authToken);
 
-            AuthData result = userService.login(loginData);
-            ctx.json(serializer.toJson(result));
+            gameService.joinGame(request);
         } catch (BadRequestException e) {
             ctx.status(400);
             ctx.json("{ \"message\": \"Error: bad request\"}");
         } catch (UnauthorizedException e) {
             ctx.status(401);
             ctx.json("{ \"message\": \"Error: unauthorized\"}");
+        } catch (AlreadyTakenException e) {
+            ctx.status(403);
+            ctx.json("{ \"message\": \"Error: already taken\"}");
         } catch (Exception e) {
             ctx.status(500);
             ctx.json(String.format("{ \"message\": \"Error: %s\"}", e.getMessage()));
