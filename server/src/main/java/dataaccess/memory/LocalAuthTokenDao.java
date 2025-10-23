@@ -1,5 +1,7 @@
-package dataaccess;
+package dataaccess.memory;
 
+import dataaccess.AuthTokenDao;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import service.UnauthorizedException;
 

@@ -1,6 +1,11 @@
 package service;
 
-import dataaccess.*;
+import dataaccess.AuthTokenDao;
+import dataaccess.GameDao;
+import dataaccess.UserDao;
+import dataaccess.memory.LocalAuthTokenDao;
+import dataaccess.memory.LocalGameDao;
+import dataaccess.memory.LocalUserDao;
 import handlers.results.RegisterResult;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;

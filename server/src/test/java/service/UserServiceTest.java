@@ -1,9 +1,9 @@
 package service;
 
 import dataaccess.AuthTokenDao;
-import dataaccess.LocalAuthTokenDao;
-import dataaccess.LocalUserDao;
 import dataaccess.UserDao;
+import dataaccess.memory.LocalAuthTokenDao;
+import dataaccess.memory.LocalUserDao;
 import handlers.requests.LoginRequest;
 import handlers.results.RegisterResult;
 import model.AuthData;

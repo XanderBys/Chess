@@ -1,6 +1,11 @@
 package server;
 
-import dataaccess.*;
+import dataaccess.AuthTokenDao;
+import dataaccess.GameDao;
+import dataaccess.UserDao;
+import dataaccess.memory.LocalAuthTokenDao;
+import dataaccess.memory.LocalGameDao;
+import dataaccess.memory.LocalUserDao;
 import handlers.*;
 import io.javalin.Javalin;
 import service.ClearService;
