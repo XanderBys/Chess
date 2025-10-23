@@ -54,6 +54,24 @@ public class DatabaseManager {
         }
     }
 
+    public static void createTable(String createTableSQL) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            /*String createTableSQL = """
+                    CREATE TABLE IF NOT EXISTS auth (
+                        id INT NOT NULL AUTO_INCREMENT,
+                        username VARCHAR(255) NOT NULL,
+                        authToken CHAR(16),
+                        PRIMARY KEY (id)
+                    );""";*/
+
+            try (var preparedStatement = conn.prepareStatement(createTableSQL)) {
+                var rs = preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("unable to create table to store auth sessions", e);
+        }
+    }
+
     private static void loadPropertiesFromResources() {
         try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
             if (propStream == null) {

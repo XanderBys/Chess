@@ -6,6 +6,9 @@ import dataaccess.UserDao;
 import dataaccess.memory.LocalAuthTokenDao;
 import dataaccess.memory.LocalGameDao;
 import dataaccess.memory.LocalUserDao;
+import dataaccess.mysql.MySQLAuthTokenDao;
+import dataaccess.mysql.MySQLGameDao;
+import dataaccess.mysql.MySQLUserDao;
 import handlers.*;
 import io.javalin.Javalin;
 import service.ClearService;
@@ -16,38 +19,38 @@ public class Server {
 
     private final Javalin javalin;
 
-    private UserService userService;
-    private GameService gameService;
-    private ClearService clearService;
-
-    /**
-     * Creates a new instance of Server given instances of each of the service classes
-     *
-     * @param userService  an instance of UserService to be used by the server
-     * @param gameService  an instance of GameService to be used by the server
-     * @param clearService an instance of ClearService to be used by the server
-     */
-    public Server(UserService userService, GameService gameService, ClearService clearService) {
-        this.userService = userService;
-        this.gameService = gameService;
-        this.clearService = clearService;
-
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
-    }
+    private final UserService userService;
+    private final GameService gameService;
+    private final ClearService clearService;
 
     /**
      * Creates an instance of Server without pre-instantiated versions of service classes.
+     *
+     * @param useMySql if true, uses MySQL to store server data. If false, stores data locally in memory
      */
-    public Server() {
-        this(null, null, null);
+    public Server(boolean useMySql) {
+        javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        UserDao userDao = new LocalUserDao();
-        AuthTokenDao authDao = new LocalAuthTokenDao();
-        GameDao gameDao = new LocalGameDao();
+        UserDao userDao;
+        AuthTokenDao authDao;
+        GameDao gameDao;
+        if (useMySql) {
+            userDao = new MySQLUserDao();
+            authDao = new MySQLAuthTokenDao();
+            gameDao = new MySQLGameDao();
+        } else {
+            userDao = new LocalUserDao();
+            authDao = new LocalAuthTokenDao();
+            gameDao = new LocalGameDao();
+        }
 
         userService = new UserService(userDao, authDao);
         gameService = new GameService(gameDao, authDao);
         clearService = new ClearService(userDao, authDao, gameDao);
+    }
+
+    public Server() {
+        this(false);
     }
 
     /**

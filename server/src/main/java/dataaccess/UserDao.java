@@ -20,7 +20,7 @@ public interface UserDao {
     void createUser(UserData userData) throws DataAccessException;
 
     /**
-     * Clears all user data in the database
+     * Clears all user data in the database 
      * @throws DataAccessException for database errors
      */
     void clear() throws DataAccessException;
