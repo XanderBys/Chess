@@ -74,4 +74,31 @@ public class MySQLAuthTokenDaoTests {
         Assertions.assertThrows(DataAccessException.class,
                 () -> authDao.createAuth(new AuthData(username, "12345678123456789")));
     }
+
+    @Test
+    public void getAuthSessionNormal() {
+        authDao.createAuth(authData);
+        AuthData authDataFromDb = authDao.getAuth(authToken);
+
+        Assertions.assertEquals(username, authDataFromDb.username());
+        Assertions.assertEquals(authToken, authDataFromDb.authToken());
+    }
+
+    @Test
+    public void getInvalidAuthSession() {
+        Assertions.assertThrows(DataAccessException.class, () -> authDao.getAuth(authToken));
+    }
+
+    @Test
+    public void deleteAuthSessionNormal() {
+        authDao.createAuth(authData);
+        authDao.deleteAuth(authToken);
+
+        Assertions.assertThrows(DataAccessException.class, () -> authDao.getAuth(authToken));
+    }
+
+    @Test
+    public void deleteInvalidAuthSession() {
+        Assertions.assertThrows(DataAccessException.class, () -> authDao.deleteAuth(authToken));
+    }
 }

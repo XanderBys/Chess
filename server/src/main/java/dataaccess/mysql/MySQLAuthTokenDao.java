@@ -38,12 +38,37 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return null;
+        try (var conn = DatabaseManager.getConnection()) {
+            String addAuthSQL = "SELECT * FROM " + authTableName + " WHERE authToken=?";
+            try (var preparedStatement = conn.prepareStatement(addAuthSQL)) {
+                preparedStatement.setString(1, authToken);
+                var rs = preparedStatement.executeQuery();
+                rs.next();
+                String username = rs.getString("username");
+                return new AuthData(username, authToken);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("unable to get auth data", e);
+        }
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
+        try {
+            getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw e;
+        }
 
+        try (var conn = DatabaseManager.getConnection()) {
+            String addAuthSQL = "DELETE FROM " + authTableName + " WHERE authToken=?;";
+            try (var preparedStatement = conn.prepareStatement(addAuthSQL)) {
+                preparedStatement.setString(1, authToken);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("unable to delete auth session", e);
+        }
     }
 
     @Override
@@ -59,7 +84,7 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("unable to clear auth session", e);
+            throw new DataAccessException("unable to clear auth table", e);
         }
     }
 }

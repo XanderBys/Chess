@@ -50,7 +50,7 @@ public class Server {
     }
 
     public Server() {
-        this(false);
+        this(true);
     }
 
     /**
