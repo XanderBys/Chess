@@ -53,6 +53,13 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
 
     @Override
     public void clear() throws DataAccessException {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            String addAuthSQL = "DELETE FROM " + authTableName + ";";
+            try (var preparedStatement = conn.prepareStatement(addAuthSQL)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("unable to clear auth session", e);
+        }
     }
 }

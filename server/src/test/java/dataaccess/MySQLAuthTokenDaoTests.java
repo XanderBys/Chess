@@ -2,6 +2,7 @@ package dataaccess;
 
 import dataaccess.mysql.MySQLAuthTokenDao;
 import model.AuthData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,33 @@ public class MySQLAuthTokenDaoTests {
         authDao.clear();
     }
 
+    @AfterEach
+    public void takeDown() {
+        authDao.clear();
+    }
+
+    @Test
+    public void clearTest() {
+        String[] usernames = {"user1", "user2", "user3"};
+        authDao.createAuth(new AuthData(usernames[0], authToken));
+        authDao.createAuth(new AuthData(usernames[1], authToken));
+        authDao.createAuth(new AuthData(usernames[2], authToken));
+
+        authDao.clear();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            String getAuthSQL = "SELECT COUNT(*) FROM " + MySQLAuthTokenDao.authTableName + ";";
+
+            try (var preparedStatement = conn.prepareStatement(getAuthSQL)) {
+                var rs = preparedStatement.executeQuery();
+                rs.next();
+                Assertions.assertEquals(0, rs.getInt("count(*)"));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("error accessing the database", e);
+        }
+    }
+
     @Test
     public void createAuthNormal() {
         authDao.createAuth(authData);
@@ -30,7 +58,6 @@ public class MySQLAuthTokenDaoTests {
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
                 while (rs.next()) {
-                    var id = rs.getInt("id");
                     var username = rs.getString("username");
                     var authToken = rs.getString("authToken");
                     Assertions.assertEquals(this.username, username);
@@ -40,5 +67,11 @@ public class MySQLAuthTokenDaoTests {
         } catch (SQLException e) {
             throw new DataAccessException("error accessing the database", e);
         }
+    }
+
+    @Test
+    public void createAuthInvalidAuthToken() {
+        Assertions.assertThrows(DataAccessException.class,
+                () -> authDao.createAuth(new AuthData(username, "12345678123456789")));
     }
 }
