@@ -43,7 +43,7 @@ public class DatabaseManager {
      * }
      * </code>
      */
-    static Connection getConnection() throws DataAccessException {
+    public static Connection getConnection() throws DataAccessException {
         try {
             //do not wrap the following line with a try-with-resources
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
@@ -56,14 +56,6 @@ public class DatabaseManager {
 
     public static void createTable(String createTableSQL) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            /*String createTableSQL = """
-                    CREATE TABLE IF NOT EXISTS auth (
-                        id INT NOT NULL AUTO_INCREMENT,
-                        username VARCHAR(255) NOT NULL,
-                        authToken CHAR(16),
-                        PRIMARY KEY (id)
-                    );""";*/
-
             try (var preparedStatement = conn.prepareStatement(createTableSQL)) {
                 var rs = preparedStatement.executeUpdate();
             }
