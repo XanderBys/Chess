@@ -1,11 +1,14 @@
 package dataaccess;
 
 import dataaccess.mysql.MySQLUserDao;
+import handlers.requests.LoginRequest;
 import model.UserData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
+import service.UnauthorizedException;
 
 import java.sql.SQLException;
 
@@ -45,6 +48,33 @@ public class MySQLUserDaoTests extends MySQLDaoTests {
     public void addUserLongUsername() {
         Assertions.assertThrows(DataAccessException.class,
                 () -> userDao.createUser(new UserData("a".repeat(256), password, email)));
+    }
+
+    @Test
+    public void getUserNormal() {
+        userDao.createUser(userData);
+        UserData result = userDao.getUserData(username);
+        Assertions.assertEquals(email, result.email());
+        Assertions.assertEquals(username, result.username());
+        Assertions.assertTrue(BCrypt.checkpw(password, result.password()));
+    }
+
+    @Test
+    public void getInexistentUser() {
+        Assertions.assertThrows(DataAccessException.class, () -> userDao.getUserData(username));
+    }
+
+    @Test
+    public void validateUserNormal() {
+        userDao.createUser(userData);
+        userDao.validateUser(new LoginRequest(username, password));
+    }
+
+    @Test
+    public void validateUserBadPassword() {
+        userDao.createUser(userData);
+        Assertions.assertThrows(UnauthorizedException.class,
+                () -> userDao.validateUser(new LoginRequest(username, "securePassword")));
     }
 
     @Test

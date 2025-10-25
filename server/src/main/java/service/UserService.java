@@ -79,23 +79,9 @@ public class UserService {
         validateString(request.username());
         validateString(request.password());
 
-        validateLoginData(request);
+        userDao.validateUser(request);
 
         return createAuth(request.username());
-    }
-
-    /**
-     * Checks that user is registered and that username and password match
-     * @param userToValidate an instance of LoginRequest containing username and password
-     * @throws UnauthorizedException if the password doesn't match username or if username is null
-     * @throws DataAccessException for internal data errors
-     */
-    private void validateLoginData(LoginRequest userToValidate) throws UnauthorizedException, DataAccessException {
-        UserData storedUserData = userDao.getUserData(userToValidate.username());
-
-        if (storedUserData == null || !storedUserData.password().equals(userToValidate.password())) {
-            throw new UnauthorizedException("");
-        }
     }
 
     /**

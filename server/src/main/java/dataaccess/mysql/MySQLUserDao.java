@@ -3,8 +3,10 @@ package dataaccess.mysql;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.UserDao;
+import handlers.requests.LoginRequest;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
+import service.UnauthorizedException;
 
 import java.sql.SQLException;
 
@@ -26,7 +28,28 @@ public class MySQLUserDao implements UserDao {
 
     @Override
     public UserData getUserData(String username) throws DataAccessException {
-        return null;
+        try (var conn = DatabaseManager.getConnection()) {
+            String getUserSQL = "SELECT * FROM " + userTableName + " WHERE username=?;";
+            try (var preparedStatement = conn.prepareStatement(getUserSQL)) {
+                preparedStatement.setString(1, username);
+                var rs = preparedStatement.executeQuery();
+                rs.next();
+                var hashedPassword = rs.getString("password");
+                var email = rs.getString("email");
+                return new UserData(username, hashedPassword, email);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("unable to get user data", e);
+        }
+    }
+
+    @Override
+    public void validateUser(LoginRequest request) throws UnauthorizedException, DataAccessException {
+        UserData result = getUserData(request.username());
+
+        if (!BCrypt.checkpw(request.password(), result.password())) {
+            throw new UnauthorizedException("username and password do not match");
+        }
     }
 
     @Override
