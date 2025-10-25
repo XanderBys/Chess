@@ -73,7 +73,12 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
 
     @Override
     public AuthData validateAuthData(String authToken) throws UnauthorizedException, DataAccessException {
-        return null;
+        try {
+            AuthData authData = getAuth(authToken);
+            return authData;
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException("error: not authorized");
+        }
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import service.UnauthorizedException;
 
 import java.sql.SQLException;
 
@@ -100,5 +101,18 @@ public class MySQLAuthTokenDaoTests {
     @Test
     public void deleteInvalidAuthSession() {
         Assertions.assertThrows(DataAccessException.class, () -> authDao.deleteAuth(authToken));
+    }
+
+    @Test
+    public void validateValidAuth() {
+        authDao.createAuth(authData);
+        var result = authDao.validateAuthData(authData.authToken());
+
+        Assertions.assertEquals(authData, result);
+    }
+
+    @Test
+    public void validateInvalidAuth() {
+        Assertions.assertThrows(UnauthorizedException.class, () -> authDao.validateAuthData(authToken));
     }
 }
