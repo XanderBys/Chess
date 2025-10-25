@@ -11,6 +11,8 @@ public class DatabaseManager {
     private static String dbPassword;
     private static String connectionUrl;
 
+    public static int maxStringLength = 255;
+
     /*
      * Load the database information for the db.properties file.
      */
@@ -64,6 +66,16 @@ public class DatabaseManager {
         }
     }
 
+    public static void deleteTable(String tableName) {
+        try (var conn = DatabaseManager.getConnection()) {
+            String deleteTableSQL = "DELETE FROM " + tableName + ";";
+            try (var preparedStatement = conn.prepareStatement(deleteTableSQL)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to clear table '%s'", tableName), e);
+        }
+    }
     private static void loadPropertiesFromResources() {
         try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
             if (propStream == null) {

@@ -10,12 +10,7 @@ import service.UnauthorizedException;
 
 import java.sql.SQLException;
 
-public class MySQLAuthTokenDaoTests {
-    private final String username = "xyz";
-    private final String authToken = "1234567812345678";
-    private final AuthData authData = new AuthData(username, authToken);
-    private AuthTokenDao authDao;
-
+public class MySQLAuthTokenDaoTests extends MySQLDaoTests {
     @BeforeEach
     public void setUp() {
         authDao = new MySQLAuthTokenDao();
@@ -36,17 +31,7 @@ public class MySQLAuthTokenDaoTests {
 
         authDao.clear();
 
-        try (var conn = DatabaseManager.getConnection()) {
-            String getAuthSQL = "SELECT COUNT(*) FROM " + MySQLAuthTokenDao.authTableName + ";";
-
-            try (var preparedStatement = conn.prepareStatement(getAuthSQL)) {
-                var rs = preparedStatement.executeQuery();
-                rs.next();
-                Assertions.assertEquals(0, rs.getInt("count(*)"));
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("error accessing the database", e);
-        }
+        assertTableEmpty(MySQLAuthTokenDao.authTableName);
     }
 
     @Test

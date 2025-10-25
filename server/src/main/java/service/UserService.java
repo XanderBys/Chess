@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import dataaccess.UserDao;
 import handlers.requests.LoginRequest;
 import handlers.results.RegisterResult;
@@ -36,9 +37,9 @@ public class UserService {
      */
     public RegisterResult register(UserData request)
             throws AlreadyTakenException, BadRequestException, DataAccessException {
-        validateString(request.username());
-        validateString(request.password());
-        validateString(request.email());
+        validateString(request.username(), DatabaseManager.maxStringLength);
+        validateString(request.password(), DatabaseManager.maxStringLength);
+        validateString(request.email(), DatabaseManager.maxStringLength);
 
         UserData userData = userDao.getUserData(request.username());
         if (userData != null) {

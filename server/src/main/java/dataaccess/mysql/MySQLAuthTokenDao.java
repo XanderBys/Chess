@@ -16,10 +16,10 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
         DatabaseManager.createTable(String.format("""
                 CREATE TABLE IF NOT EXISTS %s (
                     id INT NOT NULL AUTO_INCREMENT,
-                    username VARCHAR(255) NOT NULL,
+                    username VARCHAR(%d) NOT NULL,
                     authToken CHAR(16),
                     PRIMARY KEY (id)
-                );""", authTableName));
+                );""", authTableName, DatabaseManager.maxStringLength));
     }
 
     @Override
@@ -83,13 +83,6 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
 
     @Override
     public void clear() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            String addAuthSQL = "DELETE FROM " + authTableName + ";";
-            try (var preparedStatement = conn.prepareStatement(addAuthSQL)) {
-                preparedStatement.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("unable to clear auth table", e);
-        }
+        DatabaseManager.deleteTable(authTableName);
     }
 }
