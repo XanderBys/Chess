@@ -43,13 +43,8 @@ public class MySQLUserDaoTests extends MySQLDaoTests {
 
     @Test
     public void addUserLongUsername() {
-        StringBuilder sb = new StringBuilder("");
-        for (int i = 0; i < 256; i++) {
-            sb.append("a");
-        }
-
         Assertions.assertThrows(DataAccessException.class,
-                () -> userDao.createUser(new UserData(sb.toString(), password, email)));
+                () -> userDao.createUser(new UserData("a".repeat(256), password, email)));
     }
 
     @Test

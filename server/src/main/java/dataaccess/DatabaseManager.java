@@ -59,7 +59,7 @@ public class DatabaseManager {
     public static void createTable(String createTableSQL) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(createTableSQL)) {
-                var rs = preparedStatement.executeUpdate();
+                preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new DataAccessException("unable to create table to store auth sessions", e);
