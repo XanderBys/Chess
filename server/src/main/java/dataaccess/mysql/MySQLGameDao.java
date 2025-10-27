@@ -103,7 +103,7 @@ public class MySQLGameDao implements GameDao {
                 if (rs.next()) {
                     return createGameFromResult(rs);
                 } else {
-                    throw new DataAccessException("could not get game with ID " + gameId);
+                    throw new DataAccessException("could not find game with ID " + gameId);
                 }
             }
         } catch (SQLException e) {
@@ -113,7 +113,24 @@ public class MySQLGameDao implements GameDao {
 
     @Override
     public void replaceGame(int gameToReplaceId, GameData newData) throws DataAccessException {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            String updateGameSQL = "UPDATE " + gameTableName + " " + """
+                    SET whiteUsername=?,
+                       blackUsername=?,
+                       gameName=?,
+                       game=?
+                       WHERE gameID=?;""";
+            try (var preparedStatement = conn.prepareStatement(updateGameSQL)) {
+                preparedStatement.setString(1, newData.whiteUsername());
+                preparedStatement.setString(2, newData.blackUsername());
+                preparedStatement.setString(3, newData.gameName());
+                preparedStatement.setString(4, new Gson().toJson(newData.game()));
+                preparedStatement.setInt(5, gameToReplaceId);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("could not update game with id " + gameToReplaceId, e);
+        }
     }
 
     @Override

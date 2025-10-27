@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import dataaccess.mysql.MySQLGameDao;
 import model.GameData;
 import org.junit.jupiter.api.AfterEach;
@@ -86,5 +87,30 @@ public class MySQLGameDaoTests extends MySQLDaoTests {
     @Test
     public void getNonexistentGameByID() {
         Assertions.assertThrows(DataAccessException.class, () -> gameDao.getGameDataById(1));
+    }
+
+    @Test
+    public void updateGameAddUsername() {
+        int id = gameDao.addGame(gameName);
+        GameData data = gameDao.getGameDataById(id);
+
+        gameDao.replaceGame(id, data.addUser(ChessGame.TeamColor.BLACK, username));
+
+        data = gameDao.getGameDataById(id);
+
+        Assertions.assertEquals(username, data.blackUsername());
+    }
+
+    @Test
+    public void updateGameDoesntChangeOtherGames() {
+        int id = gameDao.addGame(gameName);
+        GameData data = gameDao.getGameDataById(id);
+        int id2 = gameDao.addGame("game2");
+
+        gameDao.replaceGame(id, data.addUser(ChessGame.TeamColor.BLACK, username));
+
+        GameData data2 = gameDao.getGameDataById(id2);
+
+        Assertions.assertNull(data2.blackUsername());
     }
 }
