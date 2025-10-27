@@ -50,7 +50,7 @@ public class MySQLUserDao implements UserDao {
     public void validateUser(LoginRequest request) throws UnauthorizedException, DataAccessException {
         UserData result = getUserData(request.username());
 
-        if (!BCrypt.checkpw(request.password(), result.password())) {
+        if (result == null || !BCrypt.checkpw(request.password(), result.password())) {
             throw new UnauthorizedException("username and password do not match");
         }
     }
