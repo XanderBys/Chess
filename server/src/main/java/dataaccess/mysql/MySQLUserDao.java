@@ -33,10 +33,13 @@ public class MySQLUserDao implements UserDao {
             try (var preparedStatement = conn.prepareStatement(getUserSQL)) {
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
-                rs.next();
-                var hashedPassword = rs.getString("password");
-                var email = rs.getString("email");
-                return new UserData(username, hashedPassword, email);
+                if (rs.next()) {
+                    var hashedPassword = rs.getString("password");
+                    var email = rs.getString("email");
+                    return new UserData(username, hashedPassword, email);
+                } else {
+                    return null;
+                }
             }
         } catch (SQLException e) {
             throw new DataAccessException("unable to get user data", e);

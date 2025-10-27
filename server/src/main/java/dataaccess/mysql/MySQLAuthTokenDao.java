@@ -17,9 +17,9 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
                 CREATE TABLE IF NOT EXISTS %s (
                     id INT NOT NULL AUTO_INCREMENT,
                     username VARCHAR(%d) NOT NULL,
-                    authToken CHAR(16),
+                    authToken VARCHAR(%d),
                     PRIMARY KEY (id)
-                );""", authTableName, DatabaseManager.maxStringLength));
+                );""", authTableName, DatabaseManager.maxStringLength, DatabaseManager.maxStringLength));
     }
 
     @Override
