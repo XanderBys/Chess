@@ -70,7 +70,7 @@ public class MySQLAuthTokenDaoTests extends MySQLDaoTests {
     @Test
     public void createAuthInvalidAuthToken() {
         Assertions.assertThrows(DataAccessException.class,
-                () -> authDao.createAuth(new AuthData(username, "12345678123456789")));
+                () -> authDao.createAuth(new AuthData(username, "1".repeat(256))));
     }
 
     @Test

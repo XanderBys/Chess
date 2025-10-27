@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import service.BadRequestException;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -86,7 +87,7 @@ public class MySQLGameDaoTests extends MySQLDaoTests {
 
     @Test
     public void getNonexistentGameByID() {
-        Assertions.assertThrows(DataAccessException.class, () -> gameDao.getGameDataById(1));
+        Assertions.assertThrows(BadRequestException.class, () -> gameDao.getGameDataById(1));
     }
 
     @Test

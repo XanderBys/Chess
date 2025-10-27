@@ -61,7 +61,7 @@ public class MySQLUserDaoTests extends MySQLDaoTests {
 
     @Test
     public void getInexistentUser() {
-        Assertions.assertThrows(DataAccessException.class, () -> userDao.getUserData(username));
+        Assertions.assertNull(userDao.getUserData(username));
     }
 
     @Test

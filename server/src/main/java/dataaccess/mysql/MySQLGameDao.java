@@ -6,6 +6,7 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.GameDao;
 import model.GameData;
+import service.BadRequestException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -94,7 +95,7 @@ public class MySQLGameDao implements GameDao {
     }
 
     @Override
-    public GameData getGameDataById(int gameId) throws DataAccessException {
+    public GameData getGameDataById(int gameId) throws DataAccessException, BadRequestException {
         try (var conn = DatabaseManager.getConnection()) {
             String getGameSQL = "SELECT * FROM " + gameTableName + " WHERE gameID=?";
             try (var preparedStatement = conn.prepareStatement(getGameSQL)) {
@@ -103,7 +104,7 @@ public class MySQLGameDao implements GameDao {
                 if (rs.next()) {
                     return createGameFromResult(rs);
                 } else {
-                    throw new DataAccessException("could not find game with ID " + gameId);
+                    throw new BadRequestException("could not find game with ID " + gameId);
                 }
             }
         } catch (SQLException e) {
