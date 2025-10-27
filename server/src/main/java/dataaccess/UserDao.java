@@ -4,6 +4,8 @@ import handlers.requests.LoginRequest;
 import model.UserData;
 import service.UnauthorizedException;
 
+import java.sql.SQLException;
+
 public interface UserDao {
     /**
      * Gets a user's data by username
@@ -34,5 +36,5 @@ public interface UserDao {
      * Clears all user data in the database 
      * @throws DataAccessException for database errors
      */
-    void clear() throws DataAccessException;
+    void clear() throws DataAccessException, SQLException;
 }

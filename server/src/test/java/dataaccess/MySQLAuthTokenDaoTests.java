@@ -14,12 +14,20 @@ public class MySQLAuthTokenDaoTests extends MySQLDaoTests {
     @BeforeEach
     public void setUp() {
         authDao = new MySQLAuthTokenDao();
-        authDao.clear();
+        try {
+            authDao.clear();
+        } catch (SQLException throwables) {
+            throw new RuntimeException(throwables);
+        }
     }
 
     @AfterEach
     public void takeDown() {
-        authDao.clear();
+        try {
+            authDao.clear();
+        } catch (SQLException throwables) {
+            throw new RuntimeException(throwables);
+        }
     }
 
     @Test
@@ -29,7 +37,11 @@ public class MySQLAuthTokenDaoTests extends MySQLDaoTests {
         authDao.createAuth(new AuthData(usernames[1], authToken));
         authDao.createAuth(new AuthData(usernames[2], authToken));
 
-        authDao.clear();
+        try {
+            authDao.clear();
+        } catch (SQLException throwables) {
+            throw new RuntimeException(throwables);
+        }
 
         assertTableEmpty(MySQLAuthTokenDao.authTableName);
     }

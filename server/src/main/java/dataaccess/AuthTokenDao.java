@@ -3,6 +3,8 @@ package dataaccess;
 import model.AuthData;
 import service.UnauthorizedException;
 
+import java.sql.SQLException;
+
 public interface AuthTokenDao {
     /**
      * Adds a new instance of AuthData to the database
@@ -41,5 +43,5 @@ public interface AuthTokenDao {
      * Clears all auth sessions in the database
      * @throws DataAccessException for database errors
      */
-    void clear() throws DataAccessException;
+    void clear() throws DataAccessException, SQLException;
 }

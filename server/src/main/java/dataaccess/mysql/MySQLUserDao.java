@@ -69,7 +69,7 @@ public class MySQLUserDao implements UserDao {
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException, SQLException {
         DatabaseManager.deleteTable(userTableName);
     }
 }

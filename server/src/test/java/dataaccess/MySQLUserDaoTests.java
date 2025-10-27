@@ -14,13 +14,13 @@ import java.sql.SQLException;
 
 public class MySQLUserDaoTests extends MySQLDaoTests {
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws SQLException {
         userDao = new MySQLUserDao();
         userDao.clear();
     }
 
     @AfterEach
-    public void reset() {
+    public void reset() throws SQLException {
         userDao.clear();
     }
 
@@ -78,7 +78,7 @@ public class MySQLUserDaoTests extends MySQLDaoTests {
     }
 
     @Test
-    public void clearTest() {
+    public void clearTest() throws SQLException {
         String[] usernames = {"user1", "user2", "user3"};
         userDao.createUser(new UserData(usernames[0], password, email));
         userDao.createUser(new UserData(usernames[1], password, email));

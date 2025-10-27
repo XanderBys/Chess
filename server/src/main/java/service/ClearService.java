@@ -22,8 +22,12 @@ public class ClearService {
      * @throws DataAccessException for internal data errors
      */
     public void clear() throws DataAccessException {
-        userDao.clear();
-        authDao.clear();
-        gameDao.clear();
+        try {
+            userDao.clear();
+            authDao.clear();
+            gameDao.clear();
+        } catch (java.sql.SQLException throwables) {
+            throw new RuntimeException(throwables);
+        }
     }
 }

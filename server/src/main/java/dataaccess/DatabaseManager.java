@@ -66,13 +66,27 @@ public class DatabaseManager {
         }
     }
 
-    public static void deleteTable(String tableName) {
+    public static void deleteTable(String tableName) throws SQLException, DataAccessException {
+        Connection connection = null;
         try (var conn = DatabaseManager.getConnection()) {
+            connection = conn;
+            connection.setAutoCommit(false);
+
             String deleteTableSQL = "DELETE FROM " + tableName + ";";
             try (var preparedStatement = conn.prepareStatement(deleteTableSQL)) {
                 preparedStatement.executeUpdate();
             }
+
+            String resetAutoincrementSQL = "ALTER TABLE " + tableName + " AUTO_INCREMENT = 0";
+            try (var preparedStatement = conn.prepareStatement(resetAutoincrementSQL)) {
+                preparedStatement.executeUpdate();
+            }
+
+            connection.commit();
         } catch (SQLException e) {
+            if (connection != null && !connection.isClosed()) {
+                connection.rollback();
+            }
             throw new DataAccessException(String.format("unable to clear table '%s'", tableName), e);
         }
     }

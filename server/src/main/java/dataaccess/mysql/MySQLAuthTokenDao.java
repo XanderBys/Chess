@@ -77,7 +77,7 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException, SQLException {
         DatabaseManager.deleteTable(authTableName);
     }
 }
