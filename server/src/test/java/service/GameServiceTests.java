@@ -1,7 +1,12 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.*;
+import dataaccess.AuthTokenDao;
+import dataaccess.GameDao;
+import dataaccess.UserDao;
+import dataaccess.memory.LocalAuthTokenDao;
+import dataaccess.memory.LocalGameDao;
+import dataaccess.memory.LocalUserDao;
 import handlers.requests.CreateGameRequest;
 import handlers.requests.JoinGameRequest;
 import model.GameData;

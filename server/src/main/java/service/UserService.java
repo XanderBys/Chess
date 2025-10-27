@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import dataaccess.UserDao;
 import handlers.requests.LoginRequest;
 import handlers.results.RegisterResult;
@@ -36,9 +37,9 @@ public class UserService {
      */
     public RegisterResult register(UserData request)
             throws AlreadyTakenException, BadRequestException, DataAccessException {
-        validateString(request.username());
-        validateString(request.password());
-        validateString(request.email());
+        validateString(request.username(), DatabaseManager.maxStringLength);
+        validateString(request.password(), DatabaseManager.maxStringLength);
+        validateString(request.email(), DatabaseManager.maxStringLength);
 
         UserData userData = userDao.getUserData(request.username());
         if (userData != null) {
@@ -78,23 +79,9 @@ public class UserService {
         validateString(request.username());
         validateString(request.password());
 
-        validateLoginData(request);
+        userDao.validateUser(request);
 
         return createAuth(request.username());
-    }
-
-    /**
-     * Checks that user is registered and that username and password match
-     * @param userToValidate an instance of LoginRequest containing username and password
-     * @throws UnauthorizedException if the password doesn't match username or if username is null
-     * @throws DataAccessException for internal data errors
-     */
-    private void validateLoginData(LoginRequest userToValidate) throws UnauthorizedException, DataAccessException {
-        UserData storedUserData = userDao.getUserData(userToValidate.username());
-
-        if (storedUserData == null || !storedUserData.password().equals(userToValidate.password())) {
-            throw new UnauthorizedException("");
-        }
     }
 
     /**

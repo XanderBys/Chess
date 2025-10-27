@@ -1,8 +1,11 @@
-package dataaccess;
+package dataaccess.memory;
 
+import dataaccess.AuthTokenDao;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import service.UnauthorizedException;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public class LocalAuthTokenDao implements AuthTokenDao {
@@ -24,7 +27,7 @@ public class LocalAuthTokenDao implements AuthTokenDao {
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException, SQLException {
         authorizations = new HashMap<>();
     }
 

@@ -1,6 +1,10 @@
-package dataaccess;
+package dataaccess.memory;
 
+import dataaccess.DataAccessException;
+import dataaccess.UserDao;
+import handlers.requests.LoginRequest;
 import model.UserData;
+import service.UnauthorizedException;
 
 import java.util.HashMap;
 
@@ -15,6 +19,15 @@ public class LocalUserDao implements UserDao {
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         users.put(userData.username(), userData);
+    }
+
+    @Override
+    public void validateUser(LoginRequest request) throws UnauthorizedException, DataAccessException {
+        UserData storedUserData = getUserData(request.username());
+
+        if (storedUserData == null || !storedUserData.password().equals(request.password())) {
+            throw new UnauthorizedException("");
+        }
     }
 
     @Override

@@ -1,6 +1,10 @@
 package dataaccess;
 
+import handlers.requests.LoginRequest;
 import model.UserData;
+import service.UnauthorizedException;
+
+import java.sql.SQLException;
 
 public interface UserDao {
     /**
@@ -20,8 +24,17 @@ public interface UserDao {
     void createUser(UserData userData) throws DataAccessException;
 
     /**
-     * Clears all user data in the database
+     * Checks that user is registered and that username and password match
+     *
+     * @param request an instance of LoginRequest containing username and password
+     * @throws UnauthorizedException if the password doesn't match username or if username is null
+     * @throws DataAccessException   for internal data errors
+     */
+    void validateUser(LoginRequest request) throws UnauthorizedException, DataAccessException;
+
+    /**
+     * Clears all user data in the database 
      * @throws DataAccessException for database errors
      */
-    void clear() throws DataAccessException;
+    void clear() throws DataAccessException, SQLException;
 }

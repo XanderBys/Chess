@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.GameData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 
@@ -42,5 +43,5 @@ public interface GameDao {
      * Deletes all games in the database
      * @throws DataAccessException for database errors
      */
-    void clear() throws DataAccessException;
+    void clear() throws DataAccessException, SQLException;
 }
