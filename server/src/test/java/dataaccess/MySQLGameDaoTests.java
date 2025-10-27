@@ -62,7 +62,6 @@ public class MySQLGameDaoTests extends MySQLDaoTests {
 
         for (GameData game : games) {
             Assertions.assertNotNull(game.gameName());
-            Assertions.assertNotNull(game.gameID());
             Assertions.assertNotNull(game.game());
         }
     }
@@ -71,5 +70,21 @@ public class MySQLGameDaoTests extends MySQLDaoTests {
     public void getGameListEmpty() {
         Collection<GameData> games = gameDao.listCurrentGames();
         Assertions.assertEquals(0, games.size());
+    }
+
+    @Test
+    public void getGameByIDNormal() {
+        gameDao.addGame("1");
+        gameDao.addGame("2");
+        int id = gameDao.addGame(gameName);
+        GameData data = gameDao.getGameDataById(id);
+
+        Assertions.assertEquals(id, data.gameID());
+        Assertions.assertEquals(gameName, data.gameName());
+    }
+
+    @Test
+    public void getNonexistentGameByID() {
+        Assertions.assertThrows(DataAccessException.class, () -> gameDao.getGameDataById(1));
     }
 }

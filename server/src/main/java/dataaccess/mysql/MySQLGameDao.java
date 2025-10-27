@@ -69,14 +69,7 @@ public class MySQLGameDao implements GameDao {
                 var rs = preparedStatement.executeQuery();
 
                 while (rs.next()) {
-                    int gameID = rs.getInt("gameID");
-                    String whiteUsername = rs.getString("whiteUsername");
-                    String blackUsername = rs.getString("blackUsername");
-                    String gameName = rs.getString("gameName");
-                    String gameJson = rs.getString("game");
-                    ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
-
-                    gameList.add(new GameData(gameID, whiteUsername, blackUsername, gameName, game));
+                    gameList.add(createGameFromResult(rs));
                 }
 
                 return gameList;
@@ -86,9 +79,36 @@ public class MySQLGameDao implements GameDao {
         }
     }
 
+    private GameData createGameFromResult(ResultSet rs) throws SQLException {
+        if (rs == null) {
+            return null;
+        }
+
+        int gameID = rs.getInt("gameID");
+        String whiteUsername = rs.getString("whiteUsername");
+        String blackUsername = rs.getString("blackUsername");
+        String gameName = rs.getString("gameName");
+        String gameJson = rs.getString("game");
+        ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+    }
+
     @Override
     public GameData getGameDataById(int gameId) throws DataAccessException {
-        return null;
+        try (var conn = DatabaseManager.getConnection()) {
+            String getGameSQL = "SELECT * FROM " + gameTableName + " WHERE gameID=?";
+            try (var preparedStatement = conn.prepareStatement(getGameSQL)) {
+                preparedStatement.setInt(1, gameId);
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    return createGameFromResult(rs);
+                } else {
+                    throw new DataAccessException("could not get game with ID " + gameId);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("error accessing get game with ID " + gameId, e);
+        }
     }
 
     @Override
