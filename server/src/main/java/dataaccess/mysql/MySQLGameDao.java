@@ -11,8 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MySQLGameDao implements GameDao {
     public static String gameTableName = "games";
@@ -61,7 +61,29 @@ public class MySQLGameDao implements GameDao {
 
     @Override
     public Collection<GameData> listCurrentGames() throws DataAccessException {
-        return List.of();
+        Collection<GameData> gameList = new ArrayList<>();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            String getGamesSQL = "SELECT * FROM " + gameTableName;
+            try (var preparedStatement = conn.prepareStatement(getGamesSQL)) {
+                var rs = preparedStatement.executeQuery();
+
+                while (rs.next()) {
+                    int gameID = rs.getInt("gameID");
+                    String whiteUsername = rs.getString("whiteUsername");
+                    String blackUsername = rs.getString("blackUsername");
+                    String gameName = rs.getString("gameName");
+                    String gameJson = rs.getString("game");
+                    ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
+
+                    gameList.add(new GameData(gameID, whiteUsername, blackUsername, gameName, game));
+                }
+
+                return gameList;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("unable to access current game list", e);
+        }
     }
 
     @Override
