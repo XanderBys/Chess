@@ -43,9 +43,12 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
             try (var preparedStatement = conn.prepareStatement(addAuthSQL)) {
                 preparedStatement.setString(1, authToken);
                 var rs = preparedStatement.executeQuery();
-                rs.next();
-                String username = rs.getString("username");
-                return new AuthData(username, authToken);
+                if (rs.next()) {
+                    String username = rs.getString("username");
+                    return new AuthData(username, authToken);
+                } else {
+                    return null;
+                }
             }
         } catch (SQLException e) {
             throw new DataAccessException("unable to get auth data", e);
@@ -54,7 +57,7 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        getAuth(authToken);
+        validateAuthData(authToken);
 
         try (var conn = DatabaseManager.getConnection()) {
             String addAuthSQL = "DELETE FROM " + authTableName + " WHERE authToken=?;";
@@ -70,9 +73,13 @@ public class MySQLAuthTokenDao implements AuthTokenDao {
     @Override
     public AuthData validateAuthData(String authToken) throws UnauthorizedException, DataAccessException {
         try {
-            return getAuth(authToken);
+            AuthData authData = getAuth(authToken);
+            if (authData == null) {
+                throw new UnauthorizedException("error: not authorized");
+            }
+            return authData;
         } catch (DataAccessException e) {
-            throw new UnauthorizedException("error: not authorized");
+            throw new DataAccessException("unable to validate auth data");
         }
     }
 

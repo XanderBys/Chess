@@ -84,7 +84,7 @@ public class MySQLAuthTokenDaoTests extends MySQLDaoTests {
 
     @Test
     public void getInvalidAuthSession() {
-        Assertions.assertThrows(DataAccessException.class, () -> authDao.getAuth(authToken));
+        Assertions.assertNull(authDao.getAuth(authToken));
     }
 
     @Test
@@ -92,12 +92,12 @@ public class MySQLAuthTokenDaoTests extends MySQLDaoTests {
         authDao.createAuth(authData);
         authDao.deleteAuth(authToken);
 
-        Assertions.assertThrows(DataAccessException.class, () -> authDao.getAuth(authToken));
+        Assertions.assertNull(authDao.getAuth(authToken));
     }
 
     @Test
     public void deleteInvalidAuthSession() {
-        Assertions.assertThrows(DataAccessException.class, () -> authDao.deleteAuth(authToken));
+        Assertions.assertThrows(UnauthorizedException.class, () -> authDao.deleteAuth(authToken));
     }
 
     @Test
