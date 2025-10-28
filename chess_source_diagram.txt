@@ -1,5 +1,5 @@
 actor Client
-rparticipant Server
+rparticipant server.Server
 rparticipant Handler
 rparticipant Service
 rparticipant DataAccess
@@ -7,15 +7,15 @@ database db
 
 entryspacing 0.9
 group#43829c #lightblue Registration
-Client -> Server: [POST] /user\n{"username":" ", "password":" ", "email":" "}
-Server -> Handler: {"username":" ", "password":" ", "email":" "}
+Client -> server.Server: [POST] /user\n{"username":" ", "password":" ", "email":" "}
+server.Server -> Handler: {"username":" ", "password":" ", "email":" "}
 Handler -> Service: register(RegisterRequest)
 Service -> DataAccess: getUser(username)
 DataAccess -> db:Find UserData by username
 break User with username already exists
 DataAccess --> Service: UserData
-Service --> Server: AlreadyTakenException
-Server --> Client: 403\n{"message": "Error: username already taken"}
+Service --> server.Server: AlreadyTakenException
+server.Server --> Client: 403\n{"message": "Error: username already taken"}
 end
 DataAccess --> Service: null
 Service -> DataAccess:createUser(userData)
@@ -23,43 +23,43 @@ DataAccess -> db:Add UserData
 Service -> DataAccess:createAuth(authData)
 DataAccess -> db:Add AuthData
 Service --> Handler: RegisterResult
-Handler --> Server: {"username" : " ", "authToken" : " "}
-Server --> Client: 200\n{"username" : " ", "authToken" : " "}
+Handler --> server.Server: {"username" : " ", "authToken" : " "}
+server.Server --> Client: 200\n{"username" : " ", "authToken" : " "}
 end
 
 group#orange #FCEDCA Login
-Client -> Server: [POST] /session\n{username, password}
+Client -> server.Server: [POST] /session\n{username, password}
 end
 
 group#green #lightgreen Logout
-Client -> Server: [DELETE] /session\nauthToken
+Client -> server.Server: [DELETE] /session\nauthToken
 end
 
 group#red #pink List Games
-Client -> Server: [GET] /game\nauthToken
+Client -> server.Server: [GET] /game\nauthToken
 end
 
 group#d790e0 #E3CCE6 Create Game 
-Client -> Server: [POST] /game\nauthToken\n{gameName}
+Client -> server.Server: [POST] /game\nauthToken\n{gameName}
 end
 
 group#yellow #lightyellow Join Game #black
-Client -> Server: [PUT] /game\nauthToken\n{playerColor, gameID}
+Client -> server.Server: [PUT] /game\nauthToken\n{playerColor, gameID}
 end
 
 group#gray #lightgray Clear application 
-Client -> Server: [DELETE] /db
-Server -> Handler: null
+Client -> server.Server: [DELETE] /db
+server.Server -> Handler: null
 Handler -> Service: delete()
 Service -> DataAccess: delete()
 DataAccess -> db: Delete all data
 break Failure
 DataAccess-->Service: null
-Service-->Server: DatabaseDeletionException
-Server-->Client: 500\n{"message": "Error: (description of error)" }
+Service-->server.Server: DatabaseDeletionException
+server.Server-->Client: 500\n{"message": "Error: (description of error)" }
 end
 DataAccess --> Service: null
 Service --> Handler: null
-Handler --> Server: {}
-Server --> Client: 200\n{}
+Handler --> server.Server: {}
+server.Server --> Client: 200\n{}
 end

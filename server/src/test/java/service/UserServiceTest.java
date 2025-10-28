@@ -1,9 +1,12 @@
 package service;
 
 import dataaccess.AuthTokenDao;
-import dataaccess.GameDao;
 import dataaccess.UserDao;
-import handlers.RegisterResult;
+import dataaccess.memory.LocalAuthTokenDao;
+import dataaccess.memory.LocalUserDao;
+import handlers.requests.LoginRequest;
+import handlers.results.RegisterResult;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,35 +14,36 @@ import org.junit.jupiter.api.Test;
 
 public class UserServiceTest {
     private UserService userService;
-    private ClearService clearService;
-
-    private GameDao gameDao;
-    private AuthTokenDao authDao;
-    private UserDao userDao;
 
     private final String username = "Xman";
     private final String password = "very secure";
     private final String email = "abc@gmail.com";
     private UserData newUser;
 
+    private AuthTokenDao authDao;
+
     @BeforeEach
     public void setUp() {
-        ClearService clearService = new ClearService();
-        clearService.clear();
+        UserDao userDao = new LocalUserDao();
+        authDao = new LocalAuthTokenDao();
 
-        userService = new UserService();
-
+        userService = new UserService(userDao, authDao);
         newUser = new UserData(username, password, email);
     }
 
+    /**
+     * Positive test for register service
+     */
     @Test
     public void registerUser() {
         RegisterResult result = userService.register(newUser);
 
         Assertions.assertEquals(username, result.username());
-        Assertions.assertEquals(username, result.authData().username());
     }
 
+    /**
+     * positive test for register service
+     */
     @Test
     public void registerMultipleUsers() {
         for (int i = 0; i < 100; i++) {
@@ -48,10 +52,12 @@ public class UserServiceTest {
             RegisterResult result = userService.register(user);
 
             Assertions.assertEquals(newUsername, result.username());
-            Assertions.assertEquals(newUsername, result.authData().username());
         }
     }
 
+    /**
+     * negative test for register service
+     */
     @Test
     public void usernameTaken() {
         userService.register(newUser);
@@ -61,5 +67,64 @@ public class UserServiceTest {
 
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(identicalUser));
         Assertions.assertThrows(AlreadyTakenException.class, () -> userService.register(sameUsername));
+    }
+
+    /**
+     * positive test for login service
+     */
+    @Test
+    public void normalLogin() {
+        userService.register(newUser);
+
+        AuthData loginData = userService.login(new LoginRequest(newUser.username(), newUser.password()));
+
+        Assertions.assertEquals(loginData.username(), newUser.username());
+        Assertions.assertNotNull(loginData.authToken());
+    }
+
+
+    /**
+     * negative test for login service
+     */
+    @Test
+    public void loginNoUsername() {
+        userService.register(newUser);
+
+        Assertions.assertThrows(BadRequestException.class, () -> userService.login(new LoginRequest("", newUser.password())));
+    }
+
+    /**
+     * negative test for login service
+     */
+    @Test
+    public void loginInvalidCredentials() {
+        userService.register(newUser);
+
+        Assertions.assertThrows(UnauthorizedException.class,
+                () -> userService.login(new LoginRequest(newUser.username(), "passssword")));
+    }
+
+    /**
+     * positive test for logout service
+     */
+    @Test
+    public void logoutNormal() {
+        userService.register(newUser);
+        AuthData authData = userService.login(new LoginRequest(username, password));
+
+        userService.logout(authData.authToken());
+
+        Assertions.assertThrows(UnauthorizedException.class, () -> authDao.validateAuthData(authData.authToken()));
+    }
+
+    /**
+     * negative test for logout service
+     */
+    @Test
+    public void logoutUnauthorized() {
+        userService.register(newUser);
+        userService.login(new LoginRequest(username, password));
+
+        Assertions.assertThrows(UnauthorizedException.class, () -> userService.logout("notavalidauthtoken"));
     }
 }

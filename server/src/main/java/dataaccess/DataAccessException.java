@@ -1,14 +1,13 @@
 package dataaccess;
 
-/**
- * Indicates there was an error connecting to the database
- */
-public class DataAccessException extends Exception {
-    public DataAccessException(String message) {
-        super(message);
+import java.sql.SQLException;
+
+public class DataAccessException extends RuntimeException {
+    public DataAccessException(String message, SQLException ex) {
+        super(message + "\n" + ex.getMessage());
     }
 
-    public DataAccessException(String message, Throwable ex) {
-        super(message, ex);
+    public DataAccessException(String message) {
+        super(message);
     }
 }

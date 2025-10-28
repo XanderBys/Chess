@@ -1,7 +1,13 @@
+import server.Server;
+
 public class Main {
     public static void main(String[] args) {
-        Server chessServer = new Server();
-        int port = chessServer.run(0);
-        System.out.println("Chess server running on port " + port);
+        try {
+            Server chessServer = new Server(true);
+            int port = chessServer.run(8080);
+            System.out.println("Chess server running on port " + port);
+        } catch (Exception e) {
+            System.out.println("Unable to start server: " + e.getMessage());
+        }
     }
 }

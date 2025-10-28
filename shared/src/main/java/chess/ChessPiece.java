@@ -12,30 +12,10 @@ import java.util.Objects;
 public class ChessPiece implements Cloneable {
     ChessGame.TeamColor pieceColor;
     PieceType type;
-    PieceMoveCalculator moveCalculator;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
-
-        if (this.type == PieceType.KING){
-            moveCalculator = new KingMoveCalculator();
-        }
-        else if (this.type == PieceType.QUEEN){
-            moveCalculator = new QueenMoveCalculator();
-        }
-        else if (this.type == PieceType.ROOK){
-            moveCalculator = new RookMoveCalculator();
-        }
-        else if (this.type == PieceType.BISHOP){
-            moveCalculator = new BishopMoveCalculator();
-        }
-        else if (this.type == PieceType.KNIGHT){
-            moveCalculator = new KnightMoveCalculator();
-        }
-        else if (this.type == PieceType.PAWN){
-            moveCalculator = new PawnMoveCalculator();
-        }
     }
 
     /**
@@ -72,8 +52,28 @@ public class ChessPiece implements Cloneable {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        PieceMoveCalculator moveCalculator = instantiatePieceMoveCalculator();
         moveCalculator.resetMoves();
         return moveCalculator.getMoves(board, myPosition, pieceColor);
+    }
+
+    private PieceMoveCalculator instantiatePieceMoveCalculator() {
+        PieceMoveCalculator moveCalculator = null;
+        if (this.type == PieceType.KING) {
+            moveCalculator = new KingMoveCalculator();
+        } else if (this.type == PieceType.QUEEN) {
+            moveCalculator = new QueenMoveCalculator();
+        } else if (this.type == PieceType.ROOK) {
+            moveCalculator = new RookMoveCalculator();
+        } else if (this.type == PieceType.BISHOP) {
+            moveCalculator = new BishopMoveCalculator();
+        } else if (this.type == PieceType.KNIGHT) {
+            moveCalculator = new KnightMoveCalculator();
+        } else if (this.type == PieceType.PAWN) {
+            moveCalculator = new PawnMoveCalculator();
+        }
+
+        return moveCalculator;
     }
 
     @Override
