@@ -55,16 +55,28 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Executes the given SQL command to create a table
+     *
+     * @param createTableSQL SQL describing the table to be created
+     * @throws DataAccessException for internal database errors
+     */
     public static void createTable(String createTableSQL) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(createTableSQL)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("unable to create table to store auth sessions", e);
+            throw new DataAccessException("unable to create table", e);
         }
     }
 
+    /**
+     * Deletes the table with the given name from the database
+     * @param tableName the name of the table to be deleted
+     * @throws SQLException if there is an error with the connection
+     * @throws DataAccessException for other internal database errors
+     */
     public static void deleteTable(String tableName) throws SQLException, DataAccessException {
         Connection connection = null;
         try (var conn = DatabaseManager.getConnection()) {

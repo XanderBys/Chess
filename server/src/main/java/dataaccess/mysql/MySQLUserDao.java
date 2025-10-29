@@ -13,6 +13,9 @@ import java.sql.SQLException;
 public class MySQLUserDao implements UserDao {
     public static String userTableName = "users";
 
+    /**
+     * Creates the database and a table to store user data if none exist
+     */
     public MySQLUserDao() {
         DatabaseManager.createDatabase();
         DatabaseManager.createTable(String.format("""

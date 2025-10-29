@@ -11,6 +11,9 @@ import java.sql.SQLException;
 public class MySQLAuthTokenDao implements AuthTokenDao {
     public static String authTableName = "auth";
 
+    /**
+     * Creates the database and a table to store auth tokens if none exist
+     */
     public MySQLAuthTokenDao() {
         DatabaseManager.createDatabase();
         DatabaseManager.createTable(String.format("""

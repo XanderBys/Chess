@@ -18,6 +18,9 @@ import java.util.Collection;
 public class MySQLGameDao implements GameDao {
     public static String gameTableName = "games";
 
+    /**
+     * Creates the database and a table to store games if none exist
+     */
     public MySQLGameDao() {
         DatabaseManager.createDatabase();
         DatabaseManager.createTable(String.format("""
@@ -81,6 +84,13 @@ public class MySQLGameDao implements GameDao {
         }
     }
 
+    /**
+     * Creates a new ChessGame object given the result from the SQL query to the database
+     *
+     * @param rs a ResultSet containing information about a chess game
+     * @return an instance of ChessGame corresponding to the data in ResultSet
+     * @throws SQLException for internal database errors
+     */
     private GameData createGameFromResult(ResultSet rs) throws SQLException {
         if (rs == null) {
             return null;
