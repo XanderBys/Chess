@@ -1,7 +1,5 @@
 package client.REPLs;
 
-import client.ClientAction;
-
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -11,8 +9,8 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
 public abstract class REPL {
     protected Scanner scanner;
 
-    public void run(String state, ClientAction exitAction) {
-        ClientAction result = ClientAction.NULL;
+    public void run(String state, String exitAction) {
+        String result = "";
 
         do {
             printPrompt(state);
@@ -27,7 +25,7 @@ public abstract class REPL {
         } while (!result.equals(exitAction));
     }
 
-    protected abstract ClientAction evalInput(String input);
+    protected abstract String evalInput(String input);
 
     protected void printPrompt(String state) {
         System.out.print(SET_TEXT_COLOR_LIGHT_GREY + "[" + state + "]");

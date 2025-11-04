@@ -1,7 +1,5 @@
 package client.REPLs;
 
-import client.ClientAction;
-
 import java.util.Scanner;
 
 public class LoggedOutREPL extends REPL {
@@ -10,33 +8,33 @@ public class LoggedOutREPL extends REPL {
     }
 
     public void run() {
-        run("LOGGED OUT", ClientAction.QUIT);
+        run("LOGGED OUT", "quit");
     }
 
     @Override
-    protected ClientAction evalInput(String input) {
-        String cmd = getCmd(input);
-        String[] params = getParams(input);
+    protected String evalInput(String input) {
+        Command cmd = new Command(input);
 
-        return switch (cmd) {
-            case "quit" -> ClientAction.QUIT;
-            case "login" -> login(params);
-            case "register" -> register(params);
+        return switch (cmd.getName()) {
+            case "login" -> login(cmd.getParams());
+            case "register" -> register(cmd.getParams());
+            case "quit" -> "quit";
             default -> help();
         };
     }
 
-    private ClientAction login(String[] params) {
+    private String login(String[] params) {
         // TODO: implement login
-        return null;
+        System.out.println("logging in...");
+        return "";
     }
 
-    private ClientAction register(String[] params) {
+    private String register(String[] params) {
         // TODO: implement register
         return null;
     }
 
-    private ClientAction help() {
-        return ClientAction.NULL;
+    private String help() {
+        return "help";
     }
 }
