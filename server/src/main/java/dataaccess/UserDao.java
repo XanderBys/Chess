@@ -1,7 +1,7 @@
 package dataaccess;
 
-import handlers.requests.LoginRequest;
 import model.UserData;
+import model.requests.LoginRequest;
 import service.UnauthorizedException;
 
 import java.sql.SQLException;

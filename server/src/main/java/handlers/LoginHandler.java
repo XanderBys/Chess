@@ -1,10 +1,10 @@
 package handlers;
 
 import com.google.gson.Gson;
-import handlers.requests.LoginRequest;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.AuthData;
+import model.requests.LoginRequest;
 import org.jetbrains.annotations.NotNull;
 import service.BadRequestException;
 import service.UnauthorizedException;

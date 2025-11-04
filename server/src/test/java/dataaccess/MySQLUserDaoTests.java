@@ -1,8 +1,8 @@
 package dataaccess;
 
 import dataaccess.mysql.MySQLUserDao;
-import handlers.requests.LoginRequest;
 import model.UserData;
+import model.requests.LoginRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

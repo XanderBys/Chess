@@ -4,10 +4,10 @@ import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.UserDao;
-import handlers.requests.LoginRequest;
-import handlers.results.RegisterResult;
 import model.AuthData;
 import model.UserData;
+import model.requests.LoginRequest;
+import model.results.RegisterResult;
 
 import java.util.UUID;
 

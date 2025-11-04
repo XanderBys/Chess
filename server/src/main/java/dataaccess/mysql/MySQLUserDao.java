@@ -3,8 +3,8 @@ package dataaccess.mysql;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.UserDao;
-import handlers.requests.LoginRequest;
 import model.UserData;
+import model.requests.LoginRequest;
 import org.mindrot.jbcrypt.BCrypt;
 import service.UnauthorizedException;
 

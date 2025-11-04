@@ -2,8 +2,8 @@ package dataaccess.memory;
 
 import dataaccess.DataAccessException;
 import dataaccess.UserDao;
-import handlers.requests.LoginRequest;
 import model.UserData;
+import model.requests.LoginRequest;
 import service.UnauthorizedException;
 
 import java.util.HashMap;
