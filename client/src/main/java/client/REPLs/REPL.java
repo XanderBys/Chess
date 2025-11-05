@@ -33,4 +33,17 @@ public abstract class REPL {
         System.out.print(SET_TEXT_COLOR_LIGHT_GREY + "[" + state + "]");
         System.out.print(SET_TEXT_COLOR_WHITE + " >>> ");
     }
+
+    protected boolean verifyParameters(int desiredLength, String[] params) {
+        if (params.length >= desiredLength) {
+            for (String param : params) {
+                if (param.isEmpty()) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

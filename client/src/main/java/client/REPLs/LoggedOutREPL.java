@@ -1,5 +1,6 @@
 package client.REPLs;
 
+import model.UserData;
 import model.requests.LoginRequest;
 import server.ResponseException;
 import server.ServerFacade;
@@ -33,8 +34,10 @@ public class LoggedOutREPL extends REPL {
 
     private String login(String[] params) {
         try {
-            if (verifyLoginParameters(params)) {
+            if (verifyParameters(2, params)) {
                 serverFacade.login(new LoginRequest(params[0], params[1]));
+                System.out.println("Successfully logged in!");
+                return "login";
             } else {
                 System.out.println("You must provide both username and password");
             }
@@ -48,16 +51,28 @@ public class LoggedOutREPL extends REPL {
             System.out.println("It's not possible to log you in right now. Please try again later.");
         }
 
-        return "login";
-    }
-
-    private boolean verifyLoginParameters(String[] params) {
-        return params.length == 2 && !params[0].isEmpty() && !params[1].isEmpty();
+        return "";
     }
 
     private String register(String[] params) {
-        // TODO: implement register
-        return null;
+        try {
+            if (verifyParameters(3, params)) {
+                serverFacade.register(new UserData(params[0], params[1], params[2]));
+                System.out.println("Successfully registered! Please log in to continue.");
+                return "register";
+            } else {
+                System.out.println("Username, password, and email are all required to register. Please try again.");
+            }
+        } catch (ResponseException e) {
+            switch (e.getErrorCode()) {
+                case 400 -> System.out.println("There was an error processing your request. Please try again.");
+                case 403 -> System.out.println("Username already taken.");
+                default -> System.out.println("There was an error in processing your login.");
+            }
+        } catch (Exception e) {
+            System.out.println("It's not possible to register right now. Please try again later.");
+        }
+        return "";
     }
 
     private String help() {
