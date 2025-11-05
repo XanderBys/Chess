@@ -45,7 +45,7 @@ public class ServerFacadeTests {
     @Test
     public void negativeTestRegister() throws URISyntaxException, IOException, InterruptedException {
         UserData testUser = new UserData("abc", "ehgklsag", "qrstuv");
-        AuthData ad = sf.register(testUser);
+        sf.register(testUser);
         Assertions.assertThrows(ResponseException.class, () -> sf.register(testUser));
     }
 

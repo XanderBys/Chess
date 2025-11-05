@@ -37,6 +37,7 @@ public class LoggedOutREPL extends REPL {
             if (verifyParameters(2, params)) {
                 serverFacade.login(new LoginRequest(params[0], params[1]));
                 System.out.println("Successfully logged in!");
+                new LoggedInREPL(scanner, serverFacade).run();
                 return "login";
             } else {
                 System.out.println("You must provide both username and password");
@@ -75,7 +76,8 @@ public class LoggedOutREPL extends REPL {
         return "";
     }
 
-    private String help() {
+    @Override
+    protected String help() {
         System.out.print(SET_TEXT_COLOR_MAGENTA + "login <USERNAME> <PASSWORD> - ");
         System.out.println(SET_TEXT_COLOR_WHITE + " to access Chess functionality");
 

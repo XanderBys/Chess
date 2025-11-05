@@ -46,4 +46,6 @@ public abstract class REPL {
             return false;
         }
     }
+
+    protected abstract String help();
 }
