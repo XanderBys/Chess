@@ -61,4 +61,13 @@ public class ServerFacadeTests {
                 () -> sf.login(new LoginRequest(username, "wrong password")));
 
     }
+
+    //TODO: add ServerFacade.createGame so I can use this test
+    @Test
+    public void testLogout() throws URISyntaxException, IOException, InterruptedException {
+        AuthData ad = sf.login(loginRequest);
+        sf.logout(ad);
+
+        //Assertions.assertThrows(ResponseException.class, () -> sf.createGame("testGame"));
+    }
 }

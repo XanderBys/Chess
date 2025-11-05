@@ -8,9 +8,6 @@ import server.ServerFacade;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_MAGENTA;
-import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
-
 public class LoggedOutREPL extends REPL {
     public LoggedOutREPL(Scanner scanner, ServerFacade serverFacade) {
         this.scanner = scanner;
@@ -75,22 +72,6 @@ public class LoggedOutREPL extends REPL {
             System.out.println("It's not possible to register right now. Please try again later.");
         }
         return "";
-    }
-
-    protected String old_help() {
-        System.out.print(SET_TEXT_COLOR_MAGENTA + "login <USERNAME> <PASSWORD> - ");
-        System.out.println(SET_TEXT_COLOR_WHITE + " to access Chess functionality");
-
-        System.out.print(SET_TEXT_COLOR_MAGENTA + "register <USERNAME> <PASSWORD> <EMAIL> - ");
-        System.out.println(SET_TEXT_COLOR_WHITE + " to create an account");
-
-        System.out.print(SET_TEXT_COLOR_MAGENTA + "help - ");
-        System.out.println(SET_TEXT_COLOR_WHITE + " to display available commands");
-
-        System.out.print(SET_TEXT_COLOR_MAGENTA + "quit - ");
-        System.out.println(SET_TEXT_COLOR_WHITE + " to exit the program");
-
-        return "help";
     }
 
     protected String help() {

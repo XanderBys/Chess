@@ -23,38 +23,69 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public AuthData register(UserData userData) throws URISyntaxException, IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(serverUrl + "/user"))
-                .timeout(java.time.Duration.ofMillis(ServerFacade.TIMEOUT_LIMIT_MILLIS))
-                .POST(makeRequestBody(userData))
-                .build();
+    public void logout(AuthData authData) throws IOException, InterruptedException, URISyntaxException {
+        HttpRequest request = buildRequest("/session",
+                "DELETE",
+                new String[]{"authorization", authData.authToken()});
+        HttpResponse<String> response = sendRequest(request);
+    }
 
+    public AuthData register(UserData userData) throws URISyntaxException, IOException, InterruptedException {
+        HttpRequest request = buildRequest("/user", "POST", userData);
         HttpResponse<String> response = sendRequest(request);
 
         return new Gson().fromJson(response.body(), AuthData.class);
     }
 
     public AuthData login(LoginRequest userData) throws URISyntaxException, IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(serverUrl + "/session"))
-                .timeout(java.time.Duration.ofMillis(ServerFacade.TIMEOUT_LIMIT_MILLIS))
-                .POST(makeRequestBody(userData))
-                .build();
-
+        HttpRequest request = buildRequest("/session", "POST", userData);
         HttpResponse<String> response = sendRequest(request);
 
         return new Gson().fromJson(response.body(), AuthData.class);
     }
 
     public void clear() throws URISyntaxException, IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(serverUrl + "/db"))
-                .timeout(java.time.Duration.ofMillis(TIMEOUT_LIMIT_MILLIS))
-                .DELETE()
-                .build();
-
+        HttpRequest request = buildRequest("/db", "DELETE");
         sendRequest(request);
+    }
+
+    private HttpRequest buildRequest(String path, String type, String[] header, Object body) throws URISyntaxException {
+        HttpRequest.Builder request = HttpRequest.newBuilder()
+                .uri(new URI(serverUrl + path))
+                .timeout(java.time.Duration.ofMillis(ServerFacade.TIMEOUT_LIMIT_MILLIS));
+
+        request = addRequestHeader(request, header);
+
+        HttpRequest.BodyPublisher preparedBody = makeRequestBody(body);
+
+        request = switch (type) {
+            case "POST" -> request.POST(preparedBody);
+            case "GET" -> request.GET();
+            case "DELETE" -> request.DELETE();
+            case "PUT" -> request.PUT(preparedBody);
+            default -> request;
+        };
+
+        return request.build();
+    }
+
+    private HttpRequest buildRequest(String path, String type, Object body) throws URISyntaxException {
+        return buildRequest(path, type, new String[]{"", ""}, body);
+    }
+
+    private HttpRequest buildRequest(String path, String type, String[] header) throws URISyntaxException {
+        return buildRequest(path, type, header, null);
+    }
+
+    private HttpRequest buildRequest(String path, String type) throws URISyntaxException {
+        return buildRequest(path, type, new String[]{"", ""}, null);
+    }
+
+    private HttpRequest.Builder addRequestHeader(HttpRequest.Builder request, String[] header) {
+        if (!header[0].isEmpty() && !header[1].isEmpty()) {
+            request = request.header(header[0], header[1]);
+        }
+        return request;
     }
 
     private HttpRequest.BodyPublisher makeRequestBody(Object body) {
