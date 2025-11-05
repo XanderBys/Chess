@@ -2,6 +2,7 @@ package client.REPLs;
 
 import server.ServerFacade;
 
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class LoggedInREPL extends REPL {
@@ -53,9 +54,13 @@ public class LoggedInREPL extends REPL {
         return "logout";
     }
 
-    @Override
     protected String help() {
-        // TODO: implement help() in LoggedInREPL
-        return "";
+        return super.help(new HashMap<>() {{
+            put("logout", new String[]{"exit Chess session"});
+            put("create", new String[]{"start a new game of chess", "game name"});
+            put("list", new String[]{"list available chess games"});
+            put("join", new String[]{"join an existing chess game", "game id"});
+            put("observe", new String[]{"observe an existing chess game", "game id"});
+        }});
     }
 }

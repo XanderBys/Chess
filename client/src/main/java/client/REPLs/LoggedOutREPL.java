@@ -5,6 +5,7 @@ import model.requests.LoginRequest;
 import server.ResponseException;
 import server.ServerFacade;
 
+import java.util.HashMap;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.SET_TEXT_COLOR_MAGENTA;
@@ -76,8 +77,7 @@ public class LoggedOutREPL extends REPL {
         return "";
     }
 
-    @Override
-    protected String help() {
+    protected String old_help() {
         System.out.print(SET_TEXT_COLOR_MAGENTA + "login <USERNAME> <PASSWORD> - ");
         System.out.println(SET_TEXT_COLOR_WHITE + " to access Chess functionality");
 
@@ -91,5 +91,14 @@ public class LoggedOutREPL extends REPL {
         System.out.println(SET_TEXT_COLOR_WHITE + " to exit the program");
 
         return "help";
+    }
+
+    protected String help() {
+        return super.help(new HashMap<>() {{
+            put("login", new String[]{"to access Chess functionality", "username", "password"});
+            put("register", new String[]{"to create an account", "username", "password", "email"});
+            put("help", new String[]{"to display available commands"});
+            put("quit", new String[]{"to exit the program"});
+        }});
     }
 }

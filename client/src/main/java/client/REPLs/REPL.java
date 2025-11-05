@@ -2,10 +2,10 @@ package client.REPLs;
 
 import server.ServerFacade;
 
+import java.util.HashMap;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY;
-import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
+import static ui.EscapeSequences.*;
 
 public abstract class REPL {
     protected Scanner scanner;
@@ -47,5 +47,17 @@ public abstract class REPL {
         }
     }
 
-    protected abstract String help();
+    protected String help(HashMap<String, String[]> commandDescriptions) {
+        // iterate through commandDescriptions and print each one
+        for (String key : commandDescriptions.keySet()) {
+            String[] params = commandDescriptions.get(key);
+            System.out.print(SET_TEXT_COLOR_MAGENTA + key + " ");
+            for (int i = 1; i < params.length; i++) {
+                System.out.print("<" + params[i].toUpperCase() + "> ");
+            }
+
+            System.out.println("- " + SET_TEXT_COLOR_WHITE + params[0]);
+        }
+        return "help";
+    }
 }
