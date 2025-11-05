@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.ResponseException;
 import server.ServerFacade;
 
 import java.io.IOException;
@@ -42,8 +43,22 @@ public class ServerFacadeTests {
     }
 
     @Test
+    public void negativeTestRegister() throws URISyntaxException, IOException, InterruptedException {
+        UserData testUser = new UserData("abc", "ehgklsag", "qrstuv");
+        AuthData ad = sf.register(testUser);
+        Assertions.assertThrows(ResponseException.class, () -> sf.register(testUser));
+    }
+
+    @Test
     public void testLogin() throws URISyntaxException, IOException, InterruptedException {
         AuthData ad = sf.login(loginRequest);
         Assertions.assertNotNull(ad);
+    }
+
+    @Test
+    public void negativeTestLogin() {
+        Assertions.assertThrows(ResponseException.class,
+                () -> sf.login(new LoginRequest(username, "wrong password")));
+
     }
 }
