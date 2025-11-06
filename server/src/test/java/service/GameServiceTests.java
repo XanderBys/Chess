@@ -43,7 +43,7 @@ public class GameServiceTests {
      */
     @Test
     public void createGameNormal() {
-        int gameId = gameService.createGame(new CreateGameRequest(authToken, "name"));
+        int gameId = gameService.createGame(new CreateGameRequest(authToken, "name")).gameID();
 
         Assertions.assertNotNull(gameDao.getGameDataById(gameId));
     }
@@ -65,7 +65,7 @@ public class GameServiceTests {
         gameService.createGame(new CreateGameRequest(authToken, "first game"));
         gameService.createGame(new CreateGameRequest(authToken, "second game"));
 
-        Collection<GameData> games = gameService.listGames(authToken);
+        Collection<GameData> games = gameService.listGames(authToken).games();
         Assertions.assertEquals(2, games.size());
         for (GameData data : games) {
             Assertions.assertNotNull(data.game());
@@ -90,7 +90,7 @@ public class GameServiceTests {
      */
     @Test
     public void listGamesEmptyList() {
-        Assertions.assertEquals(0, gameService.listGames(authToken).size());
+        Assertions.assertEquals(0, gameService.listGames(authToken).games().size());
     }
 
     /**
@@ -98,7 +98,7 @@ public class GameServiceTests {
      */
     @Test
     public void joinGameNormal() {
-        int game1Id = gameService.createGame(new CreateGameRequest(authToken, "first game"));
+        int game1Id = gameService.createGame(new CreateGameRequest(authToken, "first game")).gameID();
         gameService.joinGame(new JoinGameRequest(authToken, ChessGame.TeamColor.WHITE, game1Id));
 
         Assertions.assertEquals(username, gameDao.getGameDataById(game1Id).whiteUsername());
@@ -109,7 +109,7 @@ public class GameServiceTests {
      */
     @Test
     public void joinGameAlreadyTaken() {
-        int game1Id = gameService.createGame(new CreateGameRequest(authToken, "first game"));
+        int game1Id = gameService.createGame(new CreateGameRequest(authToken, "first game")).gameID();
         gameService.joinGame(new JoinGameRequest(authToken, ChessGame.TeamColor.WHITE, game1Id));
 
         Assertions.assertThrows(AlreadyTakenException.class,

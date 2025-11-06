@@ -2,8 +2,11 @@ package server;
 
 import com.google.gson.Gson;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import model.requests.LoginRequest;
+import model.results.CreateGameResult;
+import model.results.ListGamesResult;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 public class ServerFacade {
     private static final int TIMEOUT_LIMIT_MILLIS = 5000;
@@ -23,11 +27,32 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public int createGame(String name, AuthData authData) throws URISyntaxException, IOException, InterruptedException {
+        record GameName(String gameName) {
+        }
+
+        HttpRequest request = buildRequest("/game",
+                "POST",
+                new String[]{"authorization", authData.authToken()},
+                new GameName(name));
+        HttpResponse<String> response = sendRequest(request);
+        return new Gson().fromJson(response.body(), CreateGameResult.class).gameID();
+    }
+
+    public Collection<GameData> getGameList(AuthData authData) throws URISyntaxException, IOException, InterruptedException {
+        HttpRequest request = buildRequest("/game",
+                "GET",
+                new String[]{"authorization", authData.authToken()});
+        HttpResponse<String> response = sendRequest(request);
+        ListGamesResult result = new Gson().fromJson(response.body(), ListGamesResult.class);
+        return result.games();
+    }
+
     public void logout(AuthData authData) throws IOException, InterruptedException, URISyntaxException {
         HttpRequest request = buildRequest("/session",
                 "DELETE",
                 new String[]{"authorization", authData.authToken()});
-        HttpResponse<String> response = sendRequest(request);
+        sendRequest(request);
     }
 
     public AuthData register(UserData userData) throws URISyntaxException, IOException, InterruptedException {

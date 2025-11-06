@@ -1,6 +1,7 @@
 package passoff.chess.server_facade;
 
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import model.requests.LoginRequest;
 import org.junit.jupiter.api.AfterEach;
@@ -12,6 +13,7 @@ import server.ServerFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 
 public class ServerFacadeTests {
     private static final int port = 8080;
@@ -68,6 +70,32 @@ public class ServerFacadeTests {
         AuthData ad = sf.login(loginRequest);
         sf.logout(ad);
 
-        //Assertions.assertThrows(ResponseException.class, () -> sf.createGame("testGame"));
+        Assertions.assertThrows(ResponseException.class, () -> sf.createGame("testGame", ad));
+    }
+
+    @Test
+    public void createGame() throws URISyntaxException, IOException, InterruptedException {
+        AuthData ad = sf.login(loginRequest);
+        int gameID = sf.createGame("testing", ad);
+
+        Assertions.assertEquals(1, gameID);
+    }
+
+    @Test
+    public void createDuplicateGameFails() throws URISyntaxException, IOException, InterruptedException {
+        AuthData ad = sf.login(loginRequest);
+        sf.createGame("game1", ad);
+        Assertions.assertThrows(ResponseException.class, () -> sf.createGame("game1", ad));
+    }
+
+    @Test
+    public void listGames() throws URISyntaxException, IOException, InterruptedException {
+        AuthData ad = sf.login(loginRequest);
+        sf.createGame("game1", ad);
+        sf.createGame("game2", ad);
+        sf.createGame("game3", ad);
+        Collection<GameData> gameList = sf.getGameList(ad);
+
+        Assertions.assertEquals(3, gameList.size());
     }
 }

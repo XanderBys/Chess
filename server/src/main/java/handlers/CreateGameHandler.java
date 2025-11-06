@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.requests.CreateGameRequest;
+import model.results.CreateGameResult;
 import org.jetbrains.annotations.NotNull;
 import service.BadRequestException;
 import service.GameService;
@@ -24,8 +25,8 @@ public class CreateGameHandler implements Handler {
             CreateGameRequest newGame = serializer.fromJson(ctx.body(), CreateGameRequest.class);
             newGame = newGame.withAuthToken(authToken);
 
-            int result = gameService.createGame(newGame);
-            ctx.json(String.format("{ \"gameID\": %d}", result));
+            CreateGameResult result = gameService.createGame(newGame);
+            ctx.json(new Gson().toJson(result));
         } catch (BadRequestException e) {
             ctx.status(400);
             ctx.json("{ \"message\": \"Error: bad request\"}");

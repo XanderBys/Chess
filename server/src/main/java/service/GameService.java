@@ -8,6 +8,8 @@ import model.AuthData;
 import model.GameData;
 import model.requests.CreateGameRequest;
 import model.requests.JoinGameRequest;
+import model.results.CreateGameResult;
+import model.results.ListGamesResult;
 
 import java.util.Collection;
 
@@ -31,17 +33,27 @@ public class GameService {
      * @throws UnauthorizedException if authToken is invalid
      * @throws DataAccessException   for internal errors
      */
-    public int createGame(CreateGameRequest request) throws UnauthorizedException, DataAccessException {
+    public CreateGameResult createGame(CreateGameRequest request) throws UnauthorizedException, DataAccessException {
         String authToken = request.authToken();
         String gameName = request.gameName();
         validateString(authToken);
         validateString(gameName);
 
+        checkGameNameTaken(request.gameName());
+
         authDao.validateAuthData(authToken);
 
-        return gameDao.addGame(gameName);
+        return new CreateGameResult(gameDao.addGame(gameName));
     }
 
+    private void checkGameNameTaken(String gameName) {
+        Collection<GameData> gameList = gameDao.listCurrentGames();
+        for (GameData game : gameList) {
+            if (game.gameName().equals(gameName)) {
+                throw new AlreadyTakenException("Game with name " + gameName + " already exists.");
+            }
+        }
+    }
     /**
      * Gets a list of all current games on the server
      *
@@ -50,12 +62,12 @@ public class GameService {
      * @throws UnauthorizedException if authToken is invalid
      * @throws DataAccessException   for database errors
      */
-    public Collection<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
+    public ListGamesResult listGames(String authToken) throws UnauthorizedException, DataAccessException {
         validateString(authToken);
 
         authDao.validateAuthData(authToken);
 
-        return gameDao.listCurrentGames();
+        return new ListGamesResult(gameDao.listCurrentGames());
     }
 
     /**
