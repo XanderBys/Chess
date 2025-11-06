@@ -1,5 +1,6 @@
 package passoff.chess.server_facade;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -97,5 +98,38 @@ public class ServerFacadeTests {
         Collection<GameData> gameList = sf.getGameList(ad);
 
         Assertions.assertEquals(3, gameList.size());
+    }
+
+    @Test
+    public void listGamesUnauthorized() throws URISyntaxException, IOException, InterruptedException {
+        AuthData ad = sf.login(loginRequest);
+        sf.createGame("game1", ad);
+
+        Assertions.assertThrows(ResponseException.class,
+                () -> sf.getGameList(new AuthData(username, "not an auth token")));
+    }
+
+    @Test
+    public void joinGameTest() throws URISyntaxException, IOException, InterruptedException {
+        AuthData ad = sf.login(loginRequest);
+        int id = sf.createGame("game1", ad);
+        sf.joinGame(ChessGame.TeamColor.WHITE, id, ad);
+
+        Collection<GameData> gamelist = sf.getGameList(ad);
+        GameData gameData = null;
+        for (GameData game : gamelist) {
+            gameData = game;
+        }
+
+        Assertions.assertNotNull(gameData);
+        Assertions.assertEquals(username, gameData.whiteUsername());
+    }
+
+    @Test
+    public void joinNonexistentGameTest() throws URISyntaxException, IOException, InterruptedException {
+        AuthData ad = sf.login(loginRequest);
+
+        Assertions.assertThrows(ResponseException.class,
+                () -> sf.joinGame(ChessGame.TeamColor.WHITE, 1, ad));
     }
 }

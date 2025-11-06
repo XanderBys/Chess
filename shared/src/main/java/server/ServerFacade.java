@@ -1,9 +1,11 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import model.requests.JoinGameRequest;
 import model.requests.LoginRequest;
 import model.results.CreateGameResult;
 import model.results.ListGamesResult;
@@ -25,6 +27,15 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
+    }
+
+    public void joinGame(ChessGame.TeamColor playerColor, int gameID, AuthData authData) throws IOException, InterruptedException, URISyntaxException {
+        HttpRequest request = buildRequest("/game",
+                "PUT",
+                new String[]{"authorization", authData.authToken()},
+                new JoinGameRequest(authData.authToken(), playerColor, gameID));
+
+        sendRequest(request);
     }
 
     public int createGame(String name, AuthData authData) throws URISyntaxException, IOException, InterruptedException {
