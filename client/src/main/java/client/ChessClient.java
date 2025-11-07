@@ -1,7 +1,7 @@
 package client;
 
-import client.REPLs.LoggedOutREPL;
 import server.ServerFacade;
+import ui.REPLs.LoggedOutREPL;
 
 import java.util.Scanner;
 

@@ -1,4 +1,4 @@
-package client.REPLs;
+package ui.REPLs;
 
 import java.util.Arrays;
 import java.util.Objects;

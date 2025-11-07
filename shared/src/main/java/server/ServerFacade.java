@@ -138,7 +138,10 @@ public class ServerFacade {
         if (response.statusCode() == 200) {
             return response;
         } else {
-            throw new ResponseException(response.statusCode(), response.body());
+            record ResponseBody(String message) {
+            }
+            ResponseBody message = new Gson().fromJson(response.body(), ResponseBody.class);
+            throw new ResponseException(response.statusCode(), message.message());
         }
     }
 }
