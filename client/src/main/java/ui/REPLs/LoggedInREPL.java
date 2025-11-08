@@ -1,7 +1,9 @@
 package ui.REPLs;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
+import server.ResponseException;
 import server.ServerFacade;
 
 import java.io.IOException;
@@ -48,10 +50,45 @@ public class LoggedInREPL extends REPL {
     }
 
     private String joinGame(String[] params) {
-        // TODO: implement LoggedInREPL.joinGame
+        HashMap<Integer, String> errorMessages = new HashMap() {{
+            put(400, "Please check command parameters and try again.");
+            put(401, "There was an error authenticating you.");
+            put(403,
+                    "The game name and color you chose are already taken. Please choose a different game or color.");
+        }};
+
+        executeServerFacadeAction("join",
+                (String[] p) -> {
+                    try {
+                        int gameID = getGameByListNumber(p[0]);
+                        ChessGame.TeamColor color = getTeamColorFromInput(p[1]);
+                        serverFacade.joinGame(color, gameID, authData);
+                        return null;
+                    } catch (IOException | URISyntaxException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                params,
+                2,
+                "",
+                errorMessages);
+
+        // TODO: draw board
+
         return "join";
     }
 
+    private ChessGame.TeamColor getTeamColorFromInput(String color) {
+        try {
+            return ChessGame.TeamColor.valueOf(color.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseException(400, "Player color must be either 'white' or 'black'");
+        }
+    }
+
+    private int getGameByListNumber(String listNumber) {
+        return currGameList[Integer.parseInt(listNumber)].gameID();
+    }
     private String listGames() {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(401, "There was an error authenticating you.");
@@ -144,7 +181,7 @@ public class LoggedInREPL extends REPL {
             put("logout", new String[]{"exit Chess session"});
             put("create", new String[]{"start a new game of chess", "game name"});
             put("list", new String[]{"list available chess games"});
-            put("join", new String[]{"join an existing chess game", "game id"});
+            put("join", new String[]{"join an existing chess game", "game id", "player color"});
             put("observe", new String[]{"observe an existing chess game", "game id"});
         }});
     }
