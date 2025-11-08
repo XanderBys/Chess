@@ -1,15 +1,21 @@
 package ui.REPLs;
 
 import model.AuthData;
+import model.GameData;
 import server.ServerFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.RESET_TEXT_UNDERLINE;
+import static ui.EscapeSequences.SET_TEXT_UNDERLINE;
+
 public class LoggedInREPL extends REPL {
     private final AuthData authData;
+    private GameData[] currGameList;
 
     public LoggedInREPL(Scanner scanner, ServerFacade serverFacade, AuthData authData) {
         this.scanner = scanner;
@@ -47,8 +53,47 @@ public class LoggedInREPL extends REPL {
     }
 
     private String listGames() {
-        // TODO: implement LoggedInREPL.listGames
+        HashMap<Integer, String> errorMessages = new HashMap<>() {{
+            put(401, "There was an error authenticating you.");
+        }};
+
+        Object gameList = executeServerFacadeAction("join",
+                (String[] p) -> {
+                    try {
+                        return serverFacade.getGameList(authData);
+                    } catch (URISyntaxException | IOException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                new String[]{},
+                0,
+                "",
+                errorMessages);
+
+        if (gameList != null) {
+            printGames((Collection<GameData>) gameList);
+        }
         return "list";
+    }
+
+    private void printGames(Collection<GameData> gameList) {
+        if (gameList.isEmpty()) {
+            System.out.println("No current games.");
+            return;
+        }
+
+        System.out.println(SET_TEXT_UNDERLINE + "Current game list:");
+        System.out.print(RESET_TEXT_UNDERLINE);
+
+        currGameList = new GameData[gameList.size() + 1];
+        int i = 1;
+        for (GameData game : gameList) {
+            String whiteName = game.whiteUsername() == null ? "None" : game.whiteUsername();
+            String blackName = game.blackUsername() == null ? "None" : game.blackUsername();
+            System.out.println(
+                    i + ") " + game.gameName() + ": WHITE=" + whiteName + " ; BLACK=" + blackName);
+            currGameList[i] = game;
+        }
     }
 
     private String createGame(String[] params) {
