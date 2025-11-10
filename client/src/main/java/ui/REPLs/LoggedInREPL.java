@@ -95,7 +95,6 @@ public class LoggedInREPL extends REPL {
     }
 
     private GameData getGameByListNumber(String listNumber) {
-        // TODO: check if games have already been listed first, if not throw an error
         try {
             if (currGameList == null) {
                 throw new ResponseException(500, "Please look at the list of games before joining one.");
@@ -112,6 +111,7 @@ public class LoggedInREPL extends REPL {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private String listGames() {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(401, "There was an error authenticating you.");
