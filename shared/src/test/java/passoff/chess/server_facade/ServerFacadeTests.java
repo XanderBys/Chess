@@ -65,7 +65,6 @@ public class ServerFacadeTests {
 
     }
 
-    //TODO: add ServerFacade.createGame so I can use this test
     @Test
     public void testLogout() throws URISyntaxException, IOException, InterruptedException {
         AuthData ad = sf.login(loginRequest);

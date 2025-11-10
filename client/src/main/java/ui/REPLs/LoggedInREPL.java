@@ -5,6 +5,7 @@ import model.AuthData;
 import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
+import ui.ChessBoardDrawer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -44,13 +45,21 @@ public class LoggedInREPL extends REPL {
     }
 
     private String observeGame(String[] params) {
-        // TODO: implement LoggedInREPL.observeGame
-        // TODO: implement Chess board rendering
+        GameData gameData = null;
+        if (verifyParameters(1, params)) {
+            gameData = getGameByListNumber(params[0]);
+        } else {
+            System.out.println("Observe requires exactly one parameter.");
+        }
+
+        if (gameData != null) {
+            ChessBoardDrawer.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
+        }
         return "observe";
     }
 
     private String joinGame(String[] params) {
-        HashMap<Integer, String> errorMessages = new HashMap() {{
+        HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(400, "Please check command parameters and try again.");
             put(401, "There was an error authenticating you.");
             put(403,
@@ -60,9 +69,10 @@ public class LoggedInREPL extends REPL {
         executeServerFacadeAction("join",
                 (String[] p) -> {
                     try {
-                        int gameID = getGameByListNumber(p[0]);
+                        GameData gameData = getGameByListNumber(p[0]);
                         ChessGame.TeamColor color = getTeamColorFromInput(p[1]);
-                        serverFacade.joinGame(color, gameID, authData);
+                        serverFacade.joinGame(color, gameData.gameID(), authData);
+                        ChessBoardDrawer.drawBoard(gameData.game().getBoard(), color);
                         return null;
                     } catch (IOException | URISyntaxException | InterruptedException e) {
                         throw new RuntimeException(e);
@@ -73,8 +83,6 @@ public class LoggedInREPL extends REPL {
                 "",
                 errorMessages);
 
-        // TODO: draw board
-
         return "join";
     }
 
@@ -82,13 +90,28 @@ public class LoggedInREPL extends REPL {
         try {
             return ChessGame.TeamColor.valueOf(color.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new ResponseException(400, "Player color must be either 'white' or 'black'");
+            throw new ResponseException(500, "Player color must be either 'white' or 'black'");
         }
     }
 
-    private int getGameByListNumber(String listNumber) {
-        return currGameList[Integer.parseInt(listNumber)].gameID();
+    private GameData getGameByListNumber(String listNumber) {
+        // TODO: check if games have already been listed first, if not throw an error
+        try {
+            if (currGameList == null) {
+                throw new ResponseException(500, "Please look at the list of games before joining one.");
+            }
+
+            if (listNumber.equals("0")) {
+                throw new IndexOutOfBoundsException();
+            }
+
+            return currGameList[Integer.parseInt(listNumber)];
+
+        } catch (IndexOutOfBoundsException e) {
+            throw new ResponseException(500, "Game number " + listNumber + " not found.");
+        }
     }
+
     private String listGames() {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(401, "There was an error authenticating you.");
