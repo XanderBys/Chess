@@ -9,8 +9,11 @@ import static ui.EscapeSequences.*;
 
 public class ChessBoardDrawer {
     private static final int ROW_LENGTH = 8;
-    //private static String[] COL_HEADERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
-    //private static int[] ROW_HEADERS = {1, 2, 3, 4, 5, 6, 7, 8};
+    private static final String[] COL_HEADERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    private static final int[] ROW_HEADERS = {1, 2, 3, 4, 5, 6, 7, 8};
+
+    private static final int COL_SPACING = 2;
+    private static final String PIECE_PADDING = "";
 
     public static void main(String[] args) {
         ChessGame game = new ChessGame();
@@ -20,6 +23,7 @@ public class ChessBoardDrawer {
     }
 
     public static void drawBoard(ChessBoard board, ChessGame.TeamColor perspective) {
+        printColHeaders(perspective);
         if (perspective == ChessGame.TeamColor.WHITE) {
             for (int i = ROW_LENGTH; i >= 1; i--) {
                 drawRow(board, i, perspective);
@@ -29,25 +33,80 @@ public class ChessBoardDrawer {
                 drawRow(board, i, perspective);
             }
         }
+        printColHeaders(perspective);
 
     }
 
+    private static void printColHeaders(ChessGame.TeamColor perspective) {
+        String space = " ".repeat(3);
+
+        resetColors();
+        System.out.print("   ");
+        if (perspective.equals(ChessGame.TeamColor.WHITE)) {
+            for (int i = 0; i < ROW_LENGTH; i++) {
+                System.out.print(COL_HEADERS[i] + space);
+            }
+        } else {
+            for (int i = ROW_LENGTH - 1; i >= 0; i--) {
+                System.out.print(COL_HEADERS[i] + space);
+            }
+        }
+        System.out.println();
+    }
+
+    private static void printRowHeaderPrefix(int rowNumber, ChessGame.TeamColor perspective) {
+        printRowHeader(rowNumber, perspective);
+        System.out.print(" ".repeat(COL_SPACING));
+    }
+
+    private static void printRowHeaderSuffix(int rowNumber, ChessGame.TeamColor perspective) {
+        System.out.print(" ".repeat(COL_SPACING));
+        printRowHeader(rowNumber, perspective);
+    }
+
+    private static void printRowHeader(int rowNumber, ChessGame.TeamColor perspective) {
+        resetColors();
+
+        if (perspective.equals(ChessGame.TeamColor.WHITE)) {
+            System.out.print(ROW_HEADERS[ROW_LENGTH - rowNumber]);
+        } else {
+            System.out.print(ROW_HEADERS[rowNumber - 1]);
+        }
+    }
+
     private static void drawRow(ChessBoard board, int rowNumber, ChessGame.TeamColor perspective) {
+        printRowHeaderPrefix(rowNumber, perspective);
+        drawRowOfSquares(board, rowNumber, perspective);
+        printRowHeaderSuffix(rowNumber, perspective);
+        System.out.println();
+    }
+
+    private static void drawRowOfSquares(ChessBoard board, int rowNumber, ChessGame.TeamColor perspective) {
         for (int j = 1; j <= ROW_LENGTH; j++) {
             setSquareBGColor(rowNumber, j, perspective);
 
             ChessPiece piece = board.getPiece(new ChessPosition(rowNumber, j));
             drawPiece(piece);
         }
+
         System.out.print(RESET_BG_COLOR);
-        System.out.println();
+
+        /*if (rowNumber >= 0){
+            System.out.print(" " + " ".repeat(COL_SPACING));
+            for (int i =1; i <= ROW_LENGTH; i++){
+                setSquareBGColor(rowNumber, i, perspective);
+                System.out.print(PIECE_PADDING + EMPTY + PIECE_PADDING);
+            }
+            System.out.print(RESET_BG_COLOR);
+            //System.out.println();
+        }*/
     }
 
     private static void drawPiece(ChessPiece piece) {
         if (piece == null) {
-            System.out.print(EMPTY);
+            System.out.print(PIECE_PADDING + EMPTY);
         } else if (piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-            System.out.print(SET_TEXT_COLOR_BLACK);
+            System.out.print(SET_TEXT_COLOR_BLACK + PIECE_PADDING);
             switch (piece.getPieceType()) {
                 case PAWN -> System.out.print(WHITE_PAWN);
                 case KNIGHT -> System.out.print(WHITE_KNIGHT);
@@ -57,7 +116,7 @@ public class ChessBoardDrawer {
                 case KING -> System.out.print(WHITE_KING);
             }
         } else {
-            System.out.print(SET_TEXT_COLOR_BLACK);
+            System.out.print(SET_TEXT_COLOR_BLACK + PIECE_PADDING);
             switch (piece.getPieceType()) {
                 case PAWN -> System.out.print(BLACK_PAWN);
                 case KNIGHT -> System.out.print(BLACK_KNIGHT);
@@ -67,6 +126,7 @@ public class ChessBoardDrawer {
                 case KING -> System.out.print(BLACK_KING);
             }
         }
+        System.out.print(PIECE_PADDING);
     }
 
     private static void setSquareBGColor(int row, int col, ChessGame.TeamColor perspective) {
@@ -88,5 +148,10 @@ public class ChessBoardDrawer {
 
     private static void setGreen() {
         System.out.print(SET_BG_COLOR_DARK_GREEN);
+    }
+
+    private static void resetColors() {
+        System.out.print(RESET_BG_COLOR);
+        System.out.print(RESET_TEXT_COLOR);
     }
 }
