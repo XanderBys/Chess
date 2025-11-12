@@ -32,6 +32,12 @@ public class LoggedOutREPL extends REPL {
         };
     }
 
+    /**
+     * Executes the 'login' command
+     *
+     * @param params should have two elements: username and password
+     * @return 'login' if successful
+     */
     private String login(String[] params) {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(400, "Either username or password is invalid");
@@ -59,6 +65,11 @@ public class LoggedOutREPL extends REPL {
         return "";
     }
 
+    /**
+     * Executes the register command
+     * @param params should contain three elements: username, password, and email.
+     * @return 'register' if successful
+     */
     private String register(String[] params) {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(400, "There was an error processing your request. Please try again.");
@@ -79,6 +90,7 @@ public class LoggedOutREPL extends REPL {
                 errorMessages);
 
         if (authData != null) {
+            new LoggedInREPL(scanner, serverFacade, authData).run();
             return "register";
         }
 

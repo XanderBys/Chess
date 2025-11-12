@@ -29,6 +29,16 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    /**
+     * Executes the 'join' HTTP request on the server
+     *
+     * @param playerColor a TeamColor representing the color to be played
+     * @param gameID      the database ID of the game to be joined
+     * @param authData    an instance of AuthData
+     * @throws IOException          for internal errors
+     * @throws InterruptedException for internal errors
+     * @throws URISyntaxException   for internal errors
+     */
     public void joinGame(ChessGame.TeamColor playerColor, int gameID, AuthData authData) throws IOException, InterruptedException, URISyntaxException {
         HttpRequest request = buildRequest("/game",
                 "PUT",
@@ -38,6 +48,15 @@ public class ServerFacade {
         sendRequest(request);
     }
 
+    /**
+     * Sends a 'create' HTTP request to the server
+     * @param name the name of the game to be joined
+     * @param authData an instance of AuthData
+     * @return the ID of the created game
+     * @throws URISyntaxException for internal errors
+     * @throws IOException for internal errors
+     * @throws InterruptedException for internal errors
+     */
     public int createGame(String name, AuthData authData) throws URISyntaxException, IOException, InterruptedException {
         record GameName(String gameName) {
         }
@@ -50,6 +69,14 @@ public class ServerFacade {
         return new Gson().fromJson(response.body(), CreateGameResult.class).gameID();
     }
 
+    /**
+     * Sends a request to the HTTP server to list all games
+     * @param authData an instance of AuthData
+     * @return a Collection of GameData containing the information about all of the games currently on file
+     * @throws URISyntaxException for internal errors
+     * @throws IOException for internal errors
+     * @throws InterruptedException for internal errors
+     */
     public Collection<GameData> getGameList(AuthData authData) throws URISyntaxException, IOException, InterruptedException {
         HttpRequest request = buildRequest("/game",
                 "GET",
@@ -59,6 +86,13 @@ public class ServerFacade {
         return result.games();
     }
 
+    /**
+     * Sends an HTTP request to the server to log a user out
+     * @param authData the auth session to end
+     * @throws IOException for internal errors
+     * @throws InterruptedException for internal errors
+     * @throws URISyntaxException for internal errors
+     */
     public void logout(AuthData authData) throws IOException, InterruptedException, URISyntaxException {
         HttpRequest request = buildRequest("/session",
                 "DELETE",
@@ -66,6 +100,14 @@ public class ServerFacade {
         sendRequest(request);
     }
 
+    /**
+     * Registers a new user in the database and logs the user in automatically
+     * @param userData an instance of UserData
+     * @return an instance of AuthData representing the new auth session created for the user
+     * @throws URISyntaxException for internal errors
+     * @throws IOException for internal errors
+     * @throws InterruptedException for internal errors
+     */
     public AuthData register(UserData userData) throws URISyntaxException, IOException, InterruptedException {
         HttpRequest request = buildRequest("/user", "POST", userData);
         HttpResponse<String> response = sendRequest(request);
@@ -73,6 +115,14 @@ public class ServerFacade {
         return new Gson().fromJson(response.body(), AuthData.class);
     }
 
+    /**
+     * Starts a new auth session for a user
+     * @param userData a LoginRequest (containing username and password)
+     * @return an instance of AuthData
+     * @throws URISyntaxException for internal errors
+     * @throws IOException for internal errors
+     * @throws InterruptedException for internal errors
+     */
     public AuthData login(LoginRequest userData) throws URISyntaxException, IOException, InterruptedException {
         HttpRequest request = buildRequest("/session", "POST", userData);
         HttpResponse<String> response = sendRequest(request);
@@ -80,6 +130,12 @@ public class ServerFacade {
         return new Gson().fromJson(response.body(), AuthData.class);
     }
 
+    /**
+     * Sends a DELETE HTTP request to the server and clears the database. Only used for testing purposes.
+     * @throws URISyntaxException for internal errors
+     * @throws IOException for internal errors
+     * @throws InterruptedException for internal errors
+     */
     public void clear() throws URISyntaxException, IOException, InterruptedException {
         HttpRequest request = buildRequest("/db", "DELETE");
         sendRequest(request);

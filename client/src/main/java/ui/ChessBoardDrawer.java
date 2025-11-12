@@ -14,6 +14,11 @@ public class ChessBoardDrawer {
     private static final int COL_SPACING = 3;
     private static final String PIECE_PADDING = "";
 
+    /**
+     * only for testing purposes
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         ChessGame game = new ChessGame();
         ChessBoardDrawer.drawBoard(game.getBoard(), ChessGame.TeamColor.WHITE);
@@ -21,6 +26,11 @@ public class ChessBoardDrawer {
         ChessBoardDrawer.drawBoard(game.getBoard(), ChessGame.TeamColor.BLACK);
     }
 
+    /**
+     * Draws the board and row and column headers from a given player's point of view
+     * @param board an instance of ChessBoard to be displayed on the console
+     * @param perspective a TeamColor representing the point of view to be shown
+     */
     public static void drawBoard(ChessBoard board, ChessGame.TeamColor perspective) {
         printColHeaders(perspective);
         if (perspective == ChessGame.TeamColor.WHITE) {
@@ -55,26 +65,26 @@ public class ChessBoardDrawer {
         System.out.println();
     }
 
-    private static void printRowHeaderPrefix(int rowNumber, ChessGame.TeamColor perspective) {
-        printRowHeader(rowNumber, perspective);
+    private static void printRowHeaderPrefix(int rowNumber) {
+        printRowHeader(rowNumber);
         System.out.print(" ".repeat(COL_SPACING));
     }
 
-    private static void printRowHeaderSuffix(int rowNumber, ChessGame.TeamColor perspective) {
+    private static void printRowHeaderSuffix(int rowNumber) {
         System.out.print(" ".repeat(COL_SPACING));
-        printRowHeader(rowNumber, perspective);
+        printRowHeader(rowNumber);
     }
 
-    private static void printRowHeader(int rowNumber, ChessGame.TeamColor perspective) {
+    private static void printRowHeader(int rowNumber) {
         resetColors();
 
         System.out.print(rowNumber);
     }
 
     private static void drawRow(ChessBoard board, int rowNumber, ChessGame.TeamColor perspective) {
-        printRowHeaderPrefix(rowNumber, perspective);
+        printRowHeaderPrefix(rowNumber);
         drawRowOfSquares(board, rowNumber, perspective);
-        printRowHeaderSuffix(rowNumber, perspective);
+        printRowHeaderSuffix(rowNumber);
         System.out.println();
     }
 
@@ -87,16 +97,6 @@ public class ChessBoardDrawer {
         }
 
         System.out.print(RESET_BG_COLOR);
-
-        /*if (rowNumber >= 0){
-            System.out.print(" " + " ".repeat(COL_SPACING));
-            for (int i =1; i <= ROW_LENGTH; i++){
-                setSquareBGColor(rowNumber, i, perspective);
-                System.out.print(PIECE_PADDING + EMPTY + PIECE_PADDING);
-            }
-            System.out.print(RESET_BG_COLOR);
-            //System.out.println();
-        }*/
     }
 
     private static void drawPiece(ChessPiece piece) {

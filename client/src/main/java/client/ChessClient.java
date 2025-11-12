@@ -9,19 +9,23 @@ import static ui.EscapeSequences.RESET_TEXT_ITALIC;
 import static ui.EscapeSequences.SET_TEXT_ITALIC;
 
 public class ChessClient {
-    // TODO: remove hard-coding for the port in server URL
-    private final String SERVER_URL = "http://localhost:8080";
+    private final int DEFAULT_PORT = 8080;
+    private final String SERVER_URL = "http://localhost:";
 
-    public void run() {
+    public void run(int port) {
         // welcome message
         System.out.println("Welcome to the CS 240 chess program. Please login or register.");
         System.out.println(SET_TEXT_ITALIC + "Type 'help' for more information.");
         System.out.print(RESET_TEXT_ITALIC);
 
         Scanner scanner = new Scanner(System.in);
-        ServerFacade sf = new ServerFacade(SERVER_URL);
+        ServerFacade sf = new ServerFacade(SERVER_URL + port);
         LoggedOutREPL loggedOutREPL = new LoggedOutREPL(scanner, sf);
 
         loggedOutREPL.run();
+    }
+
+    public void run() {
+        run(DEFAULT_PORT);
     }
 }

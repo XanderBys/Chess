@@ -44,6 +44,12 @@ public class LoggedInREPL extends REPL {
         };
     }
 
+    /**
+     * Allows a user to join a game as an observer. Prints an error if games have not yet been listed.
+     *
+     * @param params should contain 1 element: the number of the game to be observed
+     * @return 'observe' if successful.
+     */
     private String observeGame(String[] params) {
         GameData gameData = null;
         if (verifyParameters(1, params)) {
@@ -58,6 +64,11 @@ public class LoggedInREPL extends REPL {
         return "observe";
     }
 
+    /**
+     * Allows a user to join a game
+     * @param params should contain two elements: the number of the game to be joined and the color to be played
+     * @return 'join'
+     */
     private String joinGame(String[] params) {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(400, "Please check command parameters and try again.");
@@ -86,6 +97,11 @@ public class LoggedInREPL extends REPL {
         return "join";
     }
 
+    /**
+     * Sanitizes user input to obtain a TeamColor
+     * @param color a String, provided by the user, that is some variant of 'white' or 'black'
+     * @return a TeamColor representing the user's input
+     */
     private ChessGame.TeamColor getTeamColorFromInput(String color) {
         try {
             return ChessGame.TeamColor.valueOf(color.toUpperCase());
@@ -111,6 +127,10 @@ public class LoggedInREPL extends REPL {
         }
     }
 
+    /**
+     * executes the list command
+     * @return 'list' if successful
+     */
     @SuppressWarnings("unchecked")
     private String listGames() {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
@@ -156,6 +176,11 @@ public class LoggedInREPL extends REPL {
         }
     }
 
+    /**
+     * Creates a new game.
+     * @param params should contain 1 element: the name of the game to be created
+     * @return 'create' if successful
+     */
     private String createGame(String[] params) {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(400, "Game name is invalid. Please try again.");
@@ -178,6 +203,10 @@ public class LoggedInREPL extends REPL {
         return "create";
     }
 
+    /**
+     * Logs a user out
+     * @return 'logout'
+     */
     private String logout() {
         HashMap<Integer, String> errorMessages = new HashMap<>() {{
             put(401, "You are not authorized to perform that action. Please log in then try again.");
