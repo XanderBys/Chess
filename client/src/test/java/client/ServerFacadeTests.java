@@ -15,8 +15,8 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 
 public class ServerFacadeTests {
-    private static final int port = 8080;
-    private static final String serverUrl = "http://localhost:" + port;
+    private static final int PORT = 8080;
+    private static final String SERVER_URL = "http://localhost:" + PORT;
     private static Server server;
     private final String username = "xman";
     private final String password = "abc123";
@@ -28,7 +28,7 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() {
         server = new Server();
-        int runningPort = server.run(port);
+        int runningPort = server.run(PORT);
         System.out.println("Started test HTTP server on " + runningPort);
     }
 
@@ -39,7 +39,7 @@ public class ServerFacadeTests {
 
     @BeforeEach
     public void setUp() throws URISyntaxException, IOException, InterruptedException {
-        sf = new ServerFacade(serverUrl);
+        sf = new ServerFacade(SERVER_URL);
         sf.register(newUser);
     }
 

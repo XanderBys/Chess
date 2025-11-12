@@ -1,4 +1,4 @@
-package ui.REPLs;
+package ui.repls;
 
 import java.util.Arrays;
 import java.util.Objects;

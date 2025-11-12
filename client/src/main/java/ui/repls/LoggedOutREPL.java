@@ -1,4 +1,4 @@
-package ui.REPLs;
+package ui.repls;
 
 import model.AuthData;
 import model.UserData;

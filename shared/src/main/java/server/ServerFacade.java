@@ -39,7 +39,8 @@ public class ServerFacade {
      * @throws InterruptedException for internal errors
      * @throws URISyntaxException   for internal errors
      */
-    public void joinGame(ChessGame.TeamColor playerColor, int gameID, AuthData authData) throws IOException, InterruptedException, URISyntaxException {
+    public void joinGame(ChessGame.TeamColor playerColor, int gameID, AuthData authData)
+            throws IOException, InterruptedException, URISyntaxException {
         HttpRequest request = buildRequest("/game",
                 "PUT",
                 new String[]{"authorization", authData.authToken()},
@@ -77,7 +78,8 @@ public class ServerFacade {
      * @throws IOException for internal errors
      * @throws InterruptedException for internal errors
      */
-    public Collection<GameData> getGameList(AuthData authData) throws URISyntaxException, IOException, InterruptedException {
+    public Collection<GameData> getGameList(AuthData authData)
+            throws URISyntaxException, IOException, InterruptedException {
         HttpRequest request = buildRequest("/game",
                 "GET",
                 new String[]{"authorization", authData.authToken()});

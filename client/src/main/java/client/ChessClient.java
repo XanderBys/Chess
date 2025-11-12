@@ -1,7 +1,7 @@
 package client;
 
 import server.ServerFacade;
-import ui.REPLs.LoggedOutREPL;
+import ui.repls.LoggedOutREPL;
 
 import java.util.Scanner;
 
@@ -9,8 +9,8 @@ import static ui.EscapeSequences.RESET_TEXT_ITALIC;
 import static ui.EscapeSequences.SET_TEXT_ITALIC;
 
 public class ChessClient {
-    private final int DEFAULT_PORT = 8080;
-    private final String SERVER_URL = "http://localhost:";
+    private final static int DEFAULT_PORT = 8080;
+    private final static String SERVER_URL = "http://localhost:";
 
     public void run(int port) {
         // welcome message

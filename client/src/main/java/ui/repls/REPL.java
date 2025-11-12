@@ -1,4 +1,4 @@
-package ui.REPLs;
+package ui.repls;
 
 import server.ResponseException;
 import server.ServerFacade;

@@ -1,4 +1,4 @@
-package ui.REPLs;
+package ui.repls;
 
 import chess.ChessGame;
 import model.AuthData;
