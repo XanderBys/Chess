@@ -17,7 +17,7 @@ public class ChessBoardDrawer {
     /**
      * only for testing purposes
      *
-     * @param args
+     * @param args should be left empty
      */
     public static void main(String[] args) {
         ChessGame game = new ChessGame();

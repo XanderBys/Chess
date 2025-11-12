@@ -4,6 +4,7 @@ import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.function.Function;
 
@@ -122,11 +123,8 @@ public abstract class REPL {
             }
 
             String message = errorMessages.get(e.getErrorCode());
-            if (message != null) {
-                System.out.println(message);
-            } else {
-                System.out.println("There was an error in processing your " + actionName + " request.");
-            }
+            System.out.println(Objects.requireNonNullElseGet(message,
+                    () -> "There was an error in processing your " + actionName + " request."));
         } catch (Exception e) {
             System.out.println("It's not possible to " + actionName + " right now. Please try again later.");
         }
