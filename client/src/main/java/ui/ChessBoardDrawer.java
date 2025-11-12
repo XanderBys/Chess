@@ -10,9 +10,8 @@ import static ui.EscapeSequences.*;
 public class ChessBoardDrawer {
     private static final int ROW_LENGTH = 8;
     private static final String[] COL_HEADERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
-    private static final int[] ROW_HEADERS = {1, 2, 3, 4, 5, 6, 7, 8};
 
-    private static final int COL_SPACING = 2;
+    private static final int COL_SPACING = 3;
     private static final String PIECE_PADDING = "";
 
     public static void main(String[] args) {
@@ -41,7 +40,8 @@ public class ChessBoardDrawer {
         String space = " ".repeat(3);
 
         resetColors();
-        System.out.print("   ");
+        System.out.print(EMPTY + " ");
+
         if (perspective.equals(ChessGame.TeamColor.WHITE)) {
             for (int i = 0; i < ROW_LENGTH; i++) {
                 System.out.print(COL_HEADERS[i] + space);
@@ -51,6 +51,7 @@ public class ChessBoardDrawer {
                 System.out.print(COL_HEADERS[i] + space);
             }
         }
+
         System.out.println();
     }
 
@@ -67,11 +68,7 @@ public class ChessBoardDrawer {
     private static void printRowHeader(int rowNumber, ChessGame.TeamColor perspective) {
         resetColors();
 
-        if (perspective.equals(ChessGame.TeamColor.WHITE)) {
-            System.out.print(ROW_HEADERS[ROW_LENGTH - rowNumber]);
-        } else {
-            System.out.print(ROW_HEADERS[rowNumber - 1]);
-        }
+        System.out.print(rowNumber);
     }
 
     private static void drawRow(ChessBoard board, int rowNumber, ChessGame.TeamColor perspective) {
