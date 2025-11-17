@@ -124,6 +124,8 @@ public class LoggedInREPL extends REPL {
 
         } catch (IndexOutOfBoundsException e) {
             throw new ResponseException(500, "Game number " + listNumber + " not found.");
+        } catch (NumberFormatException e) {
+            throw new ResponseException(500, "Game number must be a positive integer.");
         }
     }
 
