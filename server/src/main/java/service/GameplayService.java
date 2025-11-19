@@ -76,7 +76,7 @@ public class GameplayService {
 
     private boolean pieceColorMatchesUsername(ChessGame.TeamColor pieceColor, GameData data, String username) {
         return (pieceColor.equals(ChessGame.TeamColor.WHITE) && data.whiteUsername().equals(username))
-                || (pieceColor.equals(ChessGame.TeamColor.BLACK) && !data.blackUsername().equals(username));
+                || (pieceColor.equals(ChessGame.TeamColor.BLACK) && data.blackUsername().equals(username));
     }
 
     private String generateMoveDescription(String username, ChessGame game, ChessMove move) {
