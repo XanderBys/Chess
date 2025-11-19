@@ -9,6 +9,7 @@ import service.GameplayService;
 import service.UnauthorizedException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
@@ -49,9 +50,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case RESIGN -> gameplayService.resign(session, username, command);
             }
         } catch (UnauthorizedException ex) {
-            throw new NotImplementedError();
+            gameplayService.sendMessage(session, new ErrorMessage("Error: user not authorized"));
         } catch (Exception ex) {
-            throw new NotImplementedError();
+            gameplayService.sendMessage(session, new ErrorMessage("An unexpected error has occurred."));
         }
     }
 }

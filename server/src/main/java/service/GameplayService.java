@@ -36,7 +36,7 @@ public class GameplayService {
     public void connect(Session session, String username, UserGameCommand cmd) throws IOException {
         ChessGame game = gameDao.getGameDataById(cmd.gameID()).game();
 
-        sendMessage(session, cmd.gameID(), new LoadGameMessage(game));
+        sendMessage(session, new LoadGameMessage(game));
         connections.broadcast(session, new NotificationMessage(username + " has joined the game!"));
     }
 
@@ -56,7 +56,7 @@ public class GameplayService {
         return authDao.getAuth(authToken).username();
     }
 
-    private void sendMessage(Session session, int gameID, ServerMessage message) throws IOException {
+    public void sendMessage(Session session, ServerMessage message) throws IOException {
         session.getRemote().sendString(new Gson().toJson(message));
     }
 }
