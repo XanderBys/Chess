@@ -27,7 +27,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleConnect(@NotNull WsConnectContext ctx) throws Exception {
-        System.out.println("websocket connected");
         ctx.enableAutomaticPings();
     }
 
@@ -42,6 +41,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             gameID = command.gameID();
             String username = gameplayService.getUsernameFromAuthToken(command.authToken());
             connections.put(gameID, session);
+
+            if (command.commandType().equals(UserGameCommand.CommandType.MAKE_MOVE)) {
+                command = serializer.fromJson(ctx.message(), MakeMoveCommand.class);
+            }
 
             switch (command.commandType()) {
                 case CONNECT -> gameplayService.connect(session, username, command);
