@@ -13,7 +13,9 @@ import handlers.*;
 import io.javalin.Javalin;
 import service.ClearService;
 import service.GameService;
+import service.GameplayService;
 import service.UserService;
+import websocket.WebSocketHandler;
 
 public class Server {
 
@@ -22,6 +24,7 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final ClearService clearService;
+    private final GameplayService gameplayService;
 
     /**
      * Creates an instance of Server without pre-instantiated versions of service classes.
@@ -47,6 +50,7 @@ public class Server {
         userService = new UserService(userDao, authDao);
         gameService = new GameService(gameDao, authDao);
         clearService = new ClearService(userDao, authDao, gameDao);
+        gameplayService = new GameplayService(userDao, authDao, gameDao);
     }
 
     public Server() {
@@ -78,6 +82,13 @@ public class Server {
         javalin.post("/game", new CreateGameHandler(gameService));
         javalin.get("/game", new ListGamesHandler(gameService));
         javalin.put("/game", new JoinGameHandler(gameService));
+
+        WebSocketHandler wsHandler = new WebSocketHandler(gameplayService);
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(wsHandler);
+            ws.onMessage(wsHandler);
+            ws.onClose(wsHandler);
+        });
     }
 
     public void stop() {

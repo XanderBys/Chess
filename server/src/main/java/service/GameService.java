@@ -110,6 +110,4 @@ public class GameService {
             throw new AlreadyTakenException("Black is already taken");
         }
     }
-
-
 }

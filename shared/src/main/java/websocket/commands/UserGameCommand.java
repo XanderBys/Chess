@@ -8,7 +8,16 @@ import java.util.Objects;
  * Note: You can add to this class, but you should not alter the existing
  * methods.
  */
-public record UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
+public class UserGameCommand {
+    private final CommandType commandType;
+    private final String authToken;
+    private final int gameID;
+
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
+        this.commandType = commandType;
+        this.authToken = authToken;
+        this.gameID = gameID;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -33,5 +42,17 @@ public record UserGameCommand(CommandType commandType, String authToken, Integer
         MAKE_MOVE,
         LEAVE,
         RESIGN
+    }
+
+    public CommandType commandType() {
+        return commandType;
+    }
+
+    public String authToken() {
+        return authToken;
+    }
+
+    public int gameID() {
+        return gameID;
     }
 }
