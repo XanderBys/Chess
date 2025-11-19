@@ -1,7 +1,9 @@
 package websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,5 +25,15 @@ public class ConnectionManager {
 
     public void remove(int gameID, Session session) {
         connections.get(gameID).remove(session);
+    }
+
+    public void broadcast(Session excludeSession, ServerMessage message) throws IOException {
+        for (HashSet<Session> set : connections.values()) {
+            for (Session session : set) {
+                if (!session.equals(excludeSession) && session.isOpen()) {
+                    session.getRemote().sendString(message.toString());
+                }
+            }
+        }
     }
 }

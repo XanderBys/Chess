@@ -16,6 +16,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     public WebSocketHandler(GameplayService gameplayService) {
         this.gameplayService = gameplayService;
+        gameplayService.setConnectionManager(connections);
     }
 
     @Override
