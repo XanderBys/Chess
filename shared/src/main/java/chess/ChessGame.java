@@ -16,6 +16,8 @@ public class ChessGame {
 
     boolean[][] enPassant = new boolean[8][8];
 
+    private boolean gameOver = false;
+
     HashMap<ChessPiece.PieceType, Boolean> whiteCastle = new HashMap<>();
     HashMap<ChessPiece.PieceType, Boolean> blackCastle = new HashMap<>();
     HashMap<TeamColor, HashMap<ChessPiece.PieceType, Boolean>> canCastle = new HashMap<>();
@@ -129,7 +131,7 @@ public class ChessGame {
             move = new ChessMove(move.getStartPosition(), move.getEndPosition(), true);
         }
 
-        if (!isValidMove(move) || (piece != null && piece.getTeamColor() != teamTurn)){
+        if (!isValidMove(move) || (piece != null && piece.getTeamColor() != teamTurn) || isGameOver()) {
             throw new InvalidMoveException(move + " is not a valid move with board:\n" + board + "\nand " + teamTurn + " to play.");
         }
 
@@ -391,6 +393,16 @@ public class ChessGame {
 
     public boolean isInCheckmate(TeamColor teamColor) {
         return isInCheckmate(this.board, teamColor);
+    }
+
+    public boolean isGameOver() {
+        return isInCheckmate(TeamColor.WHITE) || isInCheckmate(TeamColor.BLACK)
+                || isInStalemate(TeamColor.WHITE) || isInStalemate(TeamColor.BLACK)
+                || gameOver;
+    }
+
+    public void setGameOver(boolean status) {
+        gameOver = status;
     }
 
     /**

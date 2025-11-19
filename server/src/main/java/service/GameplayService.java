@@ -47,10 +47,10 @@ public class GameplayService {
     }
 
     public void makeMove(Session session, String username, MakeMoveCommand cmd) throws IOException {
-        GameData gameData = gameDao.getGameDataById(cmd.gameID());
-        ChessGame game = gameData.game();
-        ChessMove move = cmd.getMove();
         try {
+            GameData gameData = gameDao.getGameDataById(cmd.gameID());
+            ChessGame game = gameData.game();
+            ChessMove move = cmd.getMove();
             validateMove(username, gameData, move);
 
             game.makeMove(move);
@@ -111,8 +111,30 @@ public class GameplayService {
         throw new NotImplementedError();
     }
 
-    public void resign(Session session, String username, UserGameCommand cmd) {
-        throw new NotImplementedError();
+    public void resign(Session session, String username, UserGameCommand cmd) throws IOException {
+        try {
+            GameData gameData = gameDao.getGameDataById(cmd.gameID());
+
+            if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
+                sendMessage(session, new ErrorMessage("Observers do not have permission to resign."));
+                return;
+            }
+
+            ChessGame game = gameData.game();
+
+            if (game.isGameOver()) {
+                sendMessage(session, new ErrorMessage("You cannot resign a game that is already over."));
+                return;
+            }
+
+            game.setGameOver(true);
+            gameDao.replaceGame(gameData.gameID(), gameData);
+
+            connections.broadcast(null,
+                    new NotificationMessage(username + " has resigned! Game over."));
+        } catch (DataAccessException ex) {
+            sendMessage(session, new ErrorMessage("There was an internal database error. Please try again later."));
+        }
     }
 
     public String getUsernameFromAuthToken(String authToken) {
