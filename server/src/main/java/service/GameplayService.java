@@ -10,8 +10,6 @@ import dataaccess.DataAccessException;
 import dataaccess.GameDao;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import websocket.ConnectionManager;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -23,7 +21,6 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 
 public class GameplayService {
-    private static final Logger log = LoggerFactory.getLogger(GameplayService.class);
     private final GameDao gameDao;
     private final AuthTokenDao authDao;
 
@@ -38,6 +35,14 @@ public class GameplayService {
         this.connections = connections;
     }
 
+    /**
+     * Connects a user to a chess game
+     *
+     * @param session  the WebSocket session
+     * @param username of the user joining
+     * @param cmd      the connect command
+     * @throws IOException
+     */
     public void connect(Session session, String username, UserGameCommand cmd) throws IOException {
         ChessGame game = gameDao.getGameDataById(cmd.gameID()).game();
 
@@ -45,6 +50,13 @@ public class GameplayService {
         connections.broadcast(cmd.gameID(), session, new NotificationMessage(username + " has joined the game!"));
     }
 
+    /**
+     * Updates the board in the database according to the MakeMoveCommand
+     * @param session the WebSocket session of the user's connection
+     * @param username of the user making a move
+     * @param cmd MakeMoveCommand containing the ChessMove and the ChessGame to update
+     * @throws IOException for errors in WebSocket communication
+     */
     public void makeMove(Session session, String username, MakeMoveCommand cmd) throws IOException {
         try {
             GameData gameData = gameDao.getGameDataById(cmd.gameID());
@@ -65,6 +77,13 @@ public class GameplayService {
         }
     }
 
+    /**
+     * Checks whether the piece being moved belongs to the user moving it
+     * @param username of the user making a move
+     * @param data GameData of the game being played
+     * @param move to be made
+     * @throws InvalidMoveException if the piece being moved does not belong to the player moving it
+     */
     private void validateMove(String username, GameData data, ChessMove move) throws InvalidMoveException {
         ChessGame game = data.game();
         ChessGame.TeamColor pieceColor = game.getBoard().getPiece(move.getStartPosition()).getTeamColor();
@@ -115,6 +134,13 @@ public class GameplayService {
         }
     }
 
+    /**
+     * Allows a user to leave a chess game
+     * @param session WebSocket session of the user leaving
+     * @param username of the user leaving
+     * @param cmd UserGameCommand containing necessary information to leave
+     * @throws IOException for WebSocket IO errors
+     */
     public void leave(Session session, String username, UserGameCommand cmd) throws IOException {
         try {
             GameData gameData = gameDao.getGameDataById(cmd.gameID());
@@ -131,6 +157,13 @@ public class GameplayService {
         }
     }
 
+    /**
+     * Allows a user to resign from a game
+     * @param session WebSocket session of the user resigning
+     * @param username of the user resigning
+     * @param cmd UserGameCommand for the resignation
+     * @throws IOException for WebSocket IO errors
+     */
     public void resign(Session session, String username, UserGameCommand cmd) throws IOException {
         try {
             GameData gameData = gameDao.getGameDataById(cmd.gameID());

@@ -2,7 +2,6 @@ package websocket;
 
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
-import kotlin.NotImplementedError;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import service.GameplayService;
@@ -10,6 +9,8 @@ import service.UnauthorizedException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
+
+import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
@@ -21,17 +22,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleClose(@NotNull WsCloseContext ctx) throws Exception {
-        throw new NotImplementedError();
-    }
-
-    @Override
     public void handleConnect(@NotNull WsConnectContext ctx) throws Exception {
         ctx.enableAutomaticPings();
     }
 
+    /**
+     * Handles incoming messages
+     *
+     * @param ctx context variable from the WebSocket request
+     * @throws Exception for IO errors with WebSocket
+     */
     @Override
-    public void handleMessage(@NotNull WsMessageContext ctx) throws Exception {
+    public void handleMessage(@NotNull WsMessageContext ctx) throws IOException {
         int gameID = -1;
         Session session = ctx.session;
 
@@ -57,5 +59,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } catch (Exception ex) {
             gameplayService.sendMessage(session, new ErrorMessage("An unexpected error has occurred."));
         }
+    }
+
+    @Override
+    public void handleClose(@NotNull WsCloseContext wsCloseContext) {
     }
 }
