@@ -10,4 +10,14 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
             return new GameData(gameID, whiteUsername, username, gameName, game);
         }
     }
+
+    public GameData removeUser(String username) {
+        if (username.equals(whiteUsername)) {
+            return new GameData(gameID, null, blackUsername, gameName, game);
+        } else if (username.equals(blackUsername)) {
+            return new GameData(gameID, whiteUsername, null, gameName, game);
+        } else {
+            return this;
+        }
+    }
 }

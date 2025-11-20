@@ -9,9 +9,10 @@ import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
 import dataaccess.UserDao;
-import kotlin.NotImplementedError;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import websocket.ConnectionManager;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -23,6 +24,7 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 
 public class GameplayService {
+    private static final Logger log = LoggerFactory.getLogger(GameplayService.class);
     private final GameDao gameDao;
     private final UserDao userDao;
     private final AuthTokenDao authDao;
@@ -107,8 +109,21 @@ public class GameplayService {
                     new NotificationMessage(gameData.blackUsername() + " is in check!"));
         }
     }
-    public void leave(Session session, String username, UserGameCommand cmd) {
-        throw new NotImplementedError();
+
+    public void leave(Session session, String username, UserGameCommand cmd) throws IOException {
+        try {
+            GameData gameData = gameDao.getGameDataById(cmd.gameID());
+
+            if (username.equals(gameData.whiteUsername()) || username.equals(gameData.blackUsername())) {
+                gameData = gameData.removeUser(username);
+                gameDao.replaceGame(cmd.gameID(), gameData);
+            }
+
+            connections.remove(cmd.gameID(), session);
+            connections.broadcast(null, new NotificationMessage(username + " has left the game."));
+        } catch (DataAccessException e) {
+            sendMessage(session, new ErrorMessage("There was an internal database error. Please try again later."));
+        }
     }
 
     public void resign(Session session, String username, UserGameCommand cmd) throws IOException {
