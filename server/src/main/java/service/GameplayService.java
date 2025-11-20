@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
-import dataaccess.UserDao;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
@@ -26,14 +25,12 @@ import java.io.IOException;
 public class GameplayService {
     private static final Logger log = LoggerFactory.getLogger(GameplayService.class);
     private final GameDao gameDao;
-    private final UserDao userDao;
     private final AuthTokenDao authDao;
 
     private ConnectionManager connections = null;
 
-    public GameplayService(UserDao userDao, AuthTokenDao authDao, GameDao gameDao) {
+    public GameplayService(AuthTokenDao authDao, GameDao gameDao) {
         this.gameDao = gameDao;
-        this.userDao = userDao;
         this.authDao = authDao;
     }
 
@@ -45,7 +42,7 @@ public class GameplayService {
         ChessGame game = gameDao.getGameDataById(cmd.gameID()).game();
 
         sendMessage(session, new LoadGameMessage(game));
-        connections.broadcast(session, new NotificationMessage(username + " has joined the game!"));
+        connections.broadcast(cmd.gameID(), session, new NotificationMessage(username + " has joined the game!"));
     }
 
     public void makeMove(Session session, String username, MakeMoveCommand cmd) throws IOException {
@@ -57,8 +54,8 @@ public class GameplayService {
 
             game.makeMove(move);
             gameDao.replaceGame(cmd.gameID(), gameData);
-            connections.broadcast(null, new LoadGameMessage(game));
-            connections.broadcast(session, new NotificationMessage(generateMoveDescription(username, game, move)));
+            connections.broadcast(cmd.gameID(), null, new LoadGameMessage(game));
+            connections.broadcast(cmd.gameID(), session, new NotificationMessage(generateMoveDescription(username, game, move)));
 
             sendGameStateNotification(gameData);
         } catch (InvalidMoveException e) {
@@ -87,26 +84,34 @@ public class GameplayService {
     }
 
     private void sendGameStateNotification(GameData gameData) throws IOException {
-        // TODO: Make code less repetitive
+        String username = null;
+        String state = null;
         if (gameData.game().isInStalemate(ChessGame.TeamColor.WHITE)) {
-            connections.broadcast(null,
-                    new NotificationMessage(gameData.whiteUsername() + " is in stalemate! Game over."));
+            username = gameData.whiteUsername();
+            state = "stalemate";
+
         } else if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
-            connections.broadcast(null,
-                    new NotificationMessage(gameData.blackUsername() + " is in stalemate! Game over."));
+            username = gameData.blackUsername();
+            state = "stalemate";
         }
         if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            connections.broadcast(null,
-                    new NotificationMessage(gameData.whiteUsername() + " is in checkmate! Game over."));
+            username = gameData.whiteUsername();
+            state = "checkmate";
         } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            connections.broadcast(null,
-                    new NotificationMessage(gameData.blackUsername() + " is in checkmate! Game over."));
+            username = gameData.blackUsername();
+            state = "checkmate";
         } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)) {
-            connections.broadcast(null,
-                    new NotificationMessage(gameData.whiteUsername() + " is in check!"));
+            username = gameData.whiteUsername();
+            state = "check";
         } else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
-            connections.broadcast(null,
-                    new NotificationMessage(gameData.blackUsername() + " is in check!"));
+            username = gameData.blackUsername();
+            state = "check";
+        }
+
+        if (username != null) {
+            connections.broadcast(gameData.gameID(),
+                    null,
+                    new NotificationMessage(username + " is in " + state + "!"));
         }
     }
 
@@ -120,7 +125,7 @@ public class GameplayService {
             }
 
             connections.remove(cmd.gameID(), session);
-            connections.broadcast(null, new NotificationMessage(username + " has left the game."));
+            connections.broadcast(cmd.gameID(), null, new NotificationMessage(username + " has left the game."));
         } catch (DataAccessException e) {
             sendMessage(session, new ErrorMessage("There was an internal database error. Please try again later."));
         }
@@ -145,7 +150,7 @@ public class GameplayService {
             game.setGameOver(true);
             gameDao.replaceGame(gameData.gameID(), gameData);
 
-            connections.broadcast(null,
+            connections.broadcast(gameData.gameID(), null,
                     new NotificationMessage(username + " has resigned! Game over."));
         } catch (DataAccessException ex) {
             sendMessage(session, new ErrorMessage("There was an internal database error. Please try again later."));

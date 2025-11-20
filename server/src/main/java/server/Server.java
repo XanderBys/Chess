@@ -50,7 +50,7 @@ public class Server {
         userService = new UserService(userDao, authDao);
         gameService = new GameService(gameDao, authDao);
         clearService = new ClearService(userDao, authDao, gameDao);
-        gameplayService = new GameplayService(userDao, authDao, gameDao);
+        gameplayService = new GameplayService(authDao, gameDao);
     }
 
     public Server() {

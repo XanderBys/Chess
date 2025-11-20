@@ -27,12 +27,11 @@ public class ConnectionManager {
         connections.get(gameID).remove(session);
     }
 
-    public void broadcast(Session excludeSession, ServerMessage message) throws IOException {
-        for (HashSet<Session> set : connections.values()) {
-            for (Session session : set) {
-                if (!session.equals(excludeSession) && session.isOpen()) {
-                    session.getRemote().sendString(message.toString());
-                }
+    public void broadcast(int gameID, Session excludeSession, ServerMessage message) throws IOException {
+        HashSet<Session> set = connections.get(gameID);
+        for (Session session : set) {
+            if (!session.equals(excludeSession) && session.isOpen()) {
+                session.getRemote().sendString(message.toString());
             }
         }
     }
