@@ -60,7 +60,7 @@ public class Server {
     /**
      * Starts the server
      *
-     * @param desiredPort the port for the server to run on. If 0, the server starts on any availabe port.
+     * @param desiredPort the port for the server to run on. If 0, the server starts on any available port.
      * @return the port the server started on
      */
     public int run(int desiredPort) {

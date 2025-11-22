@@ -6,6 +6,8 @@ import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.ChessBoardDrawer;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import static client.ChessClient.SERVER_URL;
 import static ui.EscapeSequences.RESET_TEXT_UNDERLINE;
 import static ui.EscapeSequences.SET_TEXT_UNDERLINE;
 
@@ -77,14 +80,13 @@ public class LoggedInREPL extends REPL {
                     "The game name and color you chose are already taken. Please choose a different game or color.");
         }};
 
-        executeServerFacadeAction("join",
+        Object gameID = executeServerFacadeAction("join",
                 (String[] p) -> {
                     try {
                         GameData gameData = getGameByListNumber(p[0]);
                         ChessGame.TeamColor color = getTeamColorFromInput(p[1]);
                         serverFacade.joinGame(color, gameData.gameID(), authData);
-                        ChessBoardDrawer.drawBoard(gameData.game().getBoard(), color);
-                        return null;
+                        return gameData.gameID();
                     } catch (IOException | URISyntaxException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -93,6 +95,11 @@ public class LoggedInREPL extends REPL {
                 2,
                 "",
                 errorMessages);
+
+        if (gameID != null) {
+            WebSocketFacade wsFacade = new WebSocketFacade(SERVER_URL, new NotificationHandler());
+            new GameplayREPL(scanner, wsFacade, authData, (int) gameID).run();
+        }
 
         return "join";
     }
@@ -175,6 +182,7 @@ public class LoggedInREPL extends REPL {
             System.out.println(
                     i + ") " + game.gameName() + ": WHITE=" + whiteName + " ; BLACK=" + blackName);
             currGameList[i] = game;
+            i++;
         }
     }
 
@@ -237,6 +245,7 @@ public class LoggedInREPL extends REPL {
             put("list", new String[]{"list available chess games"});
             put("join", new String[]{"join an existing chess game", "game id", "player color"});
             put("observe", new String[]{"observe an existing chess game", "game id"});
+            put("help", new String[]{"to display available commands"});
         }});
     }
 }
