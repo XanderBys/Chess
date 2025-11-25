@@ -40,7 +40,7 @@ public class GameplayService {
      * @param session  the WebSocket session
      * @param username of the user joining
      * @param cmd      the connect command
-     * @throws IOException
+     * @throws IOException for WebSocket IO errors
      */
     public void connect(Session session, String username, UserGameCommand cmd) throws IOException {
         ChessGame game = gameDao.getGameDataById(cmd.gameID()).game();
@@ -97,7 +97,9 @@ public class GameplayService {
         ChessGame.TeamColor userColor = data.whiteUsername().equals(username) ?
                 ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 
-        if (game.getTeamTurn() != userColor) {
+        if (game.isGameOver()) {
+            throw new InvalidMoveException("You cannot make moves once the game is over.");
+        } else if (game.getTeamTurn() != userColor) {
             throw new InvalidMoveException("It is not your turn right now.");
         } else if (piece == null) {
             throw new InvalidMoveException("Moves must start on a square with a piece.");

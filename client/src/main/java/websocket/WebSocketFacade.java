@@ -13,13 +13,11 @@ import java.net.URISyntaxException;
 
 public class WebSocketFacade extends Endpoint {
     private final Session session;
-    private final NotificationHandler notificationHandler;
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler) {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-            this.notificationHandler = notificationHandler;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
