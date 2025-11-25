@@ -1,10 +1,11 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import server.ResponseException;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,9 +25,13 @@ public class WebSocketFacade extends Endpoint {
             this.session = container.connectToServer(this, socketURI);
 
             session.addMessageHandler(
-                    (MessageHandler.Whole<String>)
-                            s -> notificationHandler.notify(
-                                    new Gson().fromJson(s, ServerMessage.class))
+                    new MessageHandler.Whole<String>() {
+                        @Override
+                        public void onMessage(String s) {
+                            notificationHandler.notify(
+                                    s);
+                        }
+                    }
             );
 
         } catch (URISyntaxException | DeploymentException | IOException e) {
@@ -41,6 +46,20 @@ public class WebSocketFacade extends Endpoint {
                     authToken,
                     gameID);
             session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+    public void makeMove(ChessMove move, String authToken, int gameID) {
+        MakeMoveCommand moveCommand = new MakeMoveCommand(
+                UserGameCommand.CommandType.MAKE_MOVE,
+                authToken,
+                gameID,
+                move
+        );
+        try {
+            session.getBasicRemote().sendText(new Gson().toJson(moveCommand));
         } catch (IOException e) {
             throw new ResponseException(500, e.getMessage());
         }

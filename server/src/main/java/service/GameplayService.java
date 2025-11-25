@@ -4,7 +4,6 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.InvalidMoveException;
-import com.google.gson.Gson;
 import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
@@ -67,7 +66,9 @@ public class GameplayService {
             game.makeMove(move);
             gameDao.replaceGame(cmd.gameID(), gameData);
             connections.broadcast(cmd.gameID(), null, new LoadGameMessage(game));
-            connections.broadcast(cmd.gameID(), session, new NotificationMessage(generateMoveDescription(username, game, move)));
+            connections.broadcast(cmd.gameID(),
+                    session,
+                    new NotificationMessage(generateMoveDescription(username, game, move)));
 
             sendGameStateNotification(gameData);
         } catch (InvalidMoveException e) {
@@ -86,13 +87,15 @@ public class GameplayService {
      */
     private void validateMove(String username, GameData data, ChessMove move) throws InvalidMoveException {
         ChessGame game = data.game();
-        ChessGame.TeamColor pieceColor = game.getBoard().getPiece(move.getStartPosition()).getTeamColor();
-        if (!pieceColorMatchesUsername(pieceColor, data, username)) {
+        ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+
+        if (piece == null || !pieceColorMatchesUsername(piece, data, username)) {
             throw new InvalidMoveException();
         }
     }
 
-    private boolean pieceColorMatchesUsername(ChessGame.TeamColor pieceColor, GameData data, String username) {
+    private boolean pieceColorMatchesUsername(ChessPiece piece, GameData data, String username) {
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
         return (pieceColor.equals(ChessGame.TeamColor.WHITE) && data.whiteUsername().equals(username))
                 || (pieceColor.equals(ChessGame.TeamColor.BLACK) && data.blackUsername().equals(username));
     }
@@ -195,6 +198,6 @@ public class GameplayService {
     }
 
     public void sendMessage(Session session, ServerMessage message) throws IOException {
-        session.getRemote().sendString(new Gson().toJson(message));
+        session.getRemote().sendString(message.toString());
     }
 }

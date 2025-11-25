@@ -80,13 +80,16 @@ public class LoggedInREPL extends REPL {
                     "The game name and color you chose are already taken. Please choose a different game or color.");
         }};
 
-        Object gameID = executeServerFacadeAction("join",
+        executeServerFacadeAction("join",
                 (String[] p) -> {
                     try {
                         GameData gameData = getGameByListNumber(p[0]);
+                        int gameID = gameData.gameID();
                         ChessGame.TeamColor color = getTeamColorFromInput(p[1]);
-                        serverFacade.joinGame(color, gameData.gameID(), authData);
-                        return gameData.gameID();
+                        serverFacade.joinGame(color, gameID, authData);
+                        WebSocketFacade wsFacade = new WebSocketFacade(SERVER_URL, new NotificationHandler());
+                        new GameplayREPL(scanner, wsFacade, authData, color, gameData).run();
+                        return gameID;
                     } catch (IOException | URISyntaxException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -95,11 +98,6 @@ public class LoggedInREPL extends REPL {
                 2,
                 "",
                 errorMessages);
-
-        if (gameID != null) {
-            WebSocketFacade wsFacade = new WebSocketFacade(SERVER_URL, new NotificationHandler());
-            new GameplayREPL(scanner, wsFacade, authData, (int) gameID).run();
-        }
 
         return "join";
     }

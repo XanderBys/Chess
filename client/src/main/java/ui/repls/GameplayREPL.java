@@ -1,21 +1,45 @@
 package ui.repls;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.AuthData;
+import model.GameData;
+import ui.ChessBoardDrawer;
 import websocket.WebSocketFacade;
 
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class GameplayREPL extends REPL {
+    private static final HashMap<Character, Integer> rowLetterToNumber = new HashMap<>() {{
+        put('a', 1);
+        put('b', 2);
+        put('c', 3);
+        put('d', 4);
+        put('e', 5);
+        put('f', 6);
+        put('g', 7);
+        put('h', 8);
+    }};
+
     private final WebSocketFacade wsFacade;
     private final AuthData authData;
-    private final int gameID;
+    private final ChessGame.TeamColor teamColor;
+    private final int gameId;
+    private final ChessBoard mostRecentBoard;
 
-    public GameplayREPL(Scanner scanner, WebSocketFacade wsFacade, AuthData authData, int gameID) {
+    public GameplayREPL(Scanner scanner, WebSocketFacade wsFacade, AuthData authData,
+                        ChessGame.TeamColor teamColor, GameData gameData) {
         this.authData = authData;
-        this.gameID = gameID;
+        this.gameId = gameData.gameID();
         this.scanner = scanner;
         this.wsFacade = wsFacade;
+        this.teamColor = teamColor;
+        this.mostRecentBoard = gameData.game().getBoard();
+
+        redrawBoard();
     }
 
     public void run() {
@@ -36,18 +60,27 @@ public class GameplayREPL extends REPL {
     }
 
     private String redrawBoard() {
-        // TODO: implement redrawBoard
-        return "";
+        ChessBoardDrawer.drawBoard(mostRecentBoard, teamColor);
+        return "redraw";
     }
 
     private String leave() {
-        wsFacade.leave(authData.authToken(), gameID);
+        wsFacade.leave(authData.authToken(), gameId);
         return "leave";
     }
 
     private String makeMove(String[] params) {
-        // TODO: implement makemove
-        return "";
+        ChessPosition fromPos = getChessPositionFromString(params[0]);
+        ChessPosition toPos = getChessPositionFromString(params[1]);
+        wsFacade.makeMove(new ChessMove(fromPos, toPos), authData.authToken(), gameId);
+
+        return "makeMove";
+    }
+
+    private ChessPosition getChessPositionFromString(String s) {
+        int row = rowLetterToNumber.get(s.charAt(0));
+        int col = s.charAt(1) - '0';
+        return new ChessPosition(row, col);
     }
 
     private String resign() {
