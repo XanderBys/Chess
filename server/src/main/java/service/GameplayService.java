@@ -72,7 +72,13 @@ public class GameplayService {
 
             sendGameStateNotification(gameData);
         } catch (InvalidMoveException e) {
-            sendMessage(session, new ErrorMessage("That move is invalid, please try a different move."));
+            ErrorMessage msg;
+            if (e.getMessage() == null) {
+                msg = new ErrorMessage("That move is invalid, please try a different move.");
+            } else {
+                msg = new ErrorMessage(e.getMessage());
+            }
+            sendMessage(session, msg);
         } catch (DataAccessException e) {
             sendMessage(session, new ErrorMessage("There was an internal database error. Please try again later."));
         }
@@ -88,21 +94,21 @@ public class GameplayService {
     private void validateMove(String username, GameData data, ChessMove move) throws InvalidMoveException {
         ChessGame game = data.game();
         ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+        ChessGame.TeamColor userColor = data.whiteUsername().equals(username) ?
+                ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 
-        if (piece == null || !pieceColorMatchesUsername(piece, data, username)) {
-            throw new InvalidMoveException();
+        if (game.getTeamTurn() != userColor) {
+            throw new InvalidMoveException("It is not your turn right now.");
+        } else if (piece == null) {
+            throw new InvalidMoveException("Moves must start on a square with a piece.");
+        } else if (piece.getTeamColor() != userColor) {
+            throw new InvalidMoveException("You can only move your own pieces.");
         }
-    }
-
-    private boolean pieceColorMatchesUsername(ChessPiece piece, GameData data, String username) {
-        ChessGame.TeamColor pieceColor = piece.getTeamColor();
-        return (pieceColor.equals(ChessGame.TeamColor.WHITE) && data.whiteUsername().equals(username))
-                || (pieceColor.equals(ChessGame.TeamColor.BLACK) && data.blackUsername().equals(username));
     }
 
     private String generateMoveDescription(String username, ChessGame game, ChessMove move) {
         ChessPiece piece = game.getBoard().getPiece(move.getEndPosition());
-        return username + " moved their " + piece.getPieceType() + " to " + move.getEndPosition();
+        return username + " moved their " + piece.getPieceType();
     }
 
     private void sendGameStateNotification(GameData gameData) throws IOException {

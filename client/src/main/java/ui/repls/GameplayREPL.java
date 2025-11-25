@@ -33,6 +33,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         put('g', 7);
         put('h', 8);
     }};
+
     private static final Gson deserializer = new Gson();
     
     private final AuthData authData;
@@ -96,8 +97,8 @@ public class GameplayREPL extends REPL implements NotificationHandler {
     }
 
     private String resign() {
-        // TODO: implement resign
-        return "";
+        wsFacade.resign(authData.authToken(), gameId);
+        return "resign";
     }
 
     private String highlightLegalMoves() {

@@ -65,6 +65,19 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void resign(String authToken, int gameID) {
+        try {
+            UserGameCommand resignCommand = new UserGameCommand(
+                    UserGameCommand.CommandType.RESIGN,
+                    authToken,
+                    gameID
+            );
+            session.getBasicRemote().sendText(new Gson().toJson(resignCommand));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }

@@ -131,8 +131,10 @@ public class ChessGame {
             move = new ChessMove(move.getStartPosition(), move.getEndPosition(), true);
         }
 
-        if (!isValidMove(move) || (piece != null && piece.getTeamColor() != teamTurn) || isGameOver()) {
-            throw new InvalidMoveException(move + " is not a valid move with board:\n" + board + "\nand " + teamTurn + " to play.");
+        if (!isValidMove(move) || (piece != null && piece.getTeamColor() != teamTurn)) {
+            throw new InvalidMoveException("That move is invalid.");
+        } else if (isGameOver()) {
+            throw new InvalidMoveException("You cannot make moves once the game is over.");
         }
 
         updateBoard(this.board, move);
