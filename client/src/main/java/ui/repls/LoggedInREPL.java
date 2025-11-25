@@ -6,8 +6,6 @@ import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.ChessBoardDrawer;
-import websocket.NotificationHandler;
-import websocket.WebSocketFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -15,7 +13,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import static client.ChessClient.SERVER_URL;
 import static ui.EscapeSequences.RESET_TEXT_UNDERLINE;
 import static ui.EscapeSequences.SET_TEXT_UNDERLINE;
 
@@ -87,8 +84,7 @@ public class LoggedInREPL extends REPL {
                         int gameID = gameData.gameID();
                         ChessGame.TeamColor color = getTeamColorFromInput(p[1]);
                         serverFacade.joinGame(color, gameID, authData);
-                        WebSocketFacade wsFacade = new WebSocketFacade(SERVER_URL, new NotificationHandler());
-                        new GameplayREPL(scanner, wsFacade, authData, color, gameData).run();
+                        new GameplayREPL(scanner, authData, color, gameData).run();
                         return gameID;
                     } catch (IOException | URISyntaxException | InterruptedException e) {
                         throw new RuntimeException(e);

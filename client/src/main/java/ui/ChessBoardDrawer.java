@@ -32,7 +32,6 @@ public class ChessBoardDrawer {
      * @param perspective a TeamColor representing the point of view to be shown
      */
     public static void drawBoard(ChessBoard board, ChessGame.TeamColor perspective) {
-        // TODO: why does it not draw queen on her color from black perspective?
         printColHeaders(perspective);
         if (perspective == ChessGame.TeamColor.WHITE) {
             for (int i = ROW_LENGTH; i >= 1; i--) {
