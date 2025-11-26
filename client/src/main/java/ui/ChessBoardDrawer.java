@@ -5,6 +5,9 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import static ui.EscapeSequences.*;
 
 public class ChessBoardDrawer {
@@ -32,18 +35,23 @@ public class ChessBoardDrawer {
      * @param perspective a TeamColor representing the point of view to be shown
      */
     public static void drawBoard(ChessBoard board, ChessGame.TeamColor perspective) {
+        drawBoardHighlightSquares(board, perspective, new HashSet<>());
+    }
+
+    public static void drawBoardHighlightSquares(ChessBoard board,
+                                                 ChessGame.TeamColor perspective,
+                                                 Collection<ChessPosition> squares) {
         printColHeaders(perspective);
         if (perspective == ChessGame.TeamColor.WHITE) {
             for (int i = ROW_LENGTH; i >= 1; i--) {
-                drawRow(board, i, perspective);
+                drawRow(board, i, perspective, squares);
             }
         } else if (perspective == ChessGame.TeamColor.BLACK) {
             for (int i = 1; i <= ROW_LENGTH; i++) {
-                drawRow(board, i, perspective);
+                drawRow(board, i, perspective, squares);
             }
         }
         printColHeaders(perspective);
-
     }
 
     private static void printColHeaders(ChessGame.TeamColor perspective) {
@@ -81,17 +89,21 @@ public class ChessBoardDrawer {
         System.out.print(rowNumber);
     }
 
-    private static void drawRow(ChessBoard board, int rowNumber, ChessGame.TeamColor perspective) {
+    private static void drawRow(ChessBoard board,
+                                int rowNumber,
+                                ChessGame.TeamColor perspective,
+                                Collection<ChessPosition> squaresToHighlight) {
         printRowHeaderPrefix(rowNumber);
-        drawRowOfSquares(board, rowNumber, perspective);
+        drawRowOfSquares(board, rowNumber, perspective, squaresToHighlight);
         printRowHeaderSuffix(rowNumber);
         System.out.println();
     }
 
-    private static void drawRowOfSquares(ChessBoard board, int rowNumber, ChessGame.TeamColor perspective) {
+    private static void drawRowOfSquares(ChessBoard board,
+                                         int rowNumber,
+                                         ChessGame.TeamColor perspective,
+                                         Collection<ChessPosition> squaresToHighlight) {
         for (int j = 1; j <= ROW_LENGTH; j++) {
-            setSquareBGColor(rowNumber, j, perspective);
-
             ChessPosition position;
             if (perspective.equals(ChessGame.TeamColor.WHITE)) {
                 position = new ChessPosition(rowNumber, j);
@@ -99,6 +111,13 @@ public class ChessBoardDrawer {
                 position = new ChessPosition(rowNumber, ROW_LENGTH + 1 - j);
             }
             ChessPiece piece = board.getPiece(position);
+
+            if (squaresToHighlight.contains(position)) {
+                setSquareHighlightColor(rowNumber, j, perspective);
+            } else {
+                setSquareBGColor(rowNumber, j, perspective);
+            }
+
             drawPiece(piece);
         }
 
@@ -137,6 +156,14 @@ public class ChessBoardDrawer {
             setWhite();
         } else {
             setGreen();
+        }
+    }
+
+    private static void setSquareHighlightColor(int row, int col, ChessGame.TeamColor perspective) {
+        if (isWhiteSquare(row, col, perspective)) {
+            System.out.print(SET_BG_COLOR_YELLOW);
+        } else {
+            System.out.print(SET_BG_COLOR_DARK_YELLOW);
         }
     }
 

@@ -1,8 +1,8 @@
 package ui.repls;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import model.AuthData;
@@ -15,7 +15,9 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 
 import static client.ChessClient.SERVER_URL;
@@ -40,7 +42,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
     private final ChessGame.TeamColor teamColor;
     private final int gameId;
     private final WebSocketFacade wsFacade;
-    private ChessBoard mostRecentBoard;
+    private ChessGame currentGame;
 
     public GameplayREPL(Scanner scanner, AuthData authData,
                         ChessGame.TeamColor teamColor, GameData gameData) {
@@ -49,7 +51,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         this.scanner = scanner;
         this.wsFacade = new WebSocketFacade(SERVER_URL, this);
         this.teamColor = teamColor;
-        this.mostRecentBoard = gameData.game().getBoard();
+        this.currentGame = gameData.game();
 
         redrawBoard();
     }
@@ -65,15 +67,15 @@ public class GameplayREPL extends REPL implements NotificationHandler {
             case "redraw" -> redrawBoard();
             case "leave" -> leave();
             case "move" -> makeMove(cmd.getParams());
-            case "resign" -> resign();
-            case "show_moves" -> highlightLegalMoves();
+            case "resign" -> resignConfirmation();
+            case "show_moves" -> highlightLegalMoves(cmd.getParams());
             default -> help();
         };
     }
 
     private String redrawBoard() {
         System.out.print(RESET_TEXT_BOLD_FAINT);
-        ChessBoardDrawer.drawBoard(mostRecentBoard, teamColor);
+        ChessBoardDrawer.drawBoard(currentGame.getBoard(), teamColor);
         return "redraw";
     }
 
@@ -96,14 +98,40 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         return new ChessPosition(row, col);
     }
 
+    private String resignConfirmation() {
+        System.out.println("Are you sure you want to resign? (Y/N)");
+        String answer = scanner.nextLine();
+
+        if (answer.equals("Y")) {
+            return resign();
+        } else {
+            return "resign canceled";
+        }
+    }
+
     private String resign() {
         wsFacade.resign(authData.authToken(), gameId);
         return "resign";
     }
 
-    private String highlightLegalMoves() {
-        // TODO: implement highlightLegalMoves
-        return "";
+    private String highlightLegalMoves(String[] params) {
+        ChessPosition pos = getChessPositionFromString(params[0]);
+        ChessPiece piece = currentGame.getBoard().getPiece(pos);
+
+        if (piece == null) {
+            notifyErrorMessage(new ErrorMessage("You cannot move from an empty square."));
+        }
+
+        Collection<ChessMove> moves = currentGame.validMoves(pos);
+        Collection<ChessPosition> positions = new HashSet<>();
+        positions.add(pos);
+        for (ChessMove move : moves) {
+            positions.add(move.getEndPosition());
+        }
+
+        System.out.println();
+        ChessBoardDrawer.drawBoardHighlightSquares(currentGame.getBoard(), teamColor, positions);
+        return "highlightMoves";
     }
 
     protected String help() {
@@ -134,7 +162,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
 
     private void notifyLoadGameMessage(String msg) {
         LoadGameMessage serverMessage = deserializer.fromJson(msg, LoadGameMessage.class);
-        mostRecentBoard = serverMessage.getGame().getBoard();
+        currentGame = serverMessage.getGame();
         System.out.println();
         redrawBoard();
         printPrompt();
@@ -142,6 +170,10 @@ public class GameplayREPL extends REPL implements NotificationHandler {
 
     private void notifyErrorMessage(String msg) {
         ErrorMessage serverMessage = deserializer.fromJson(msg, ErrorMessage.class);
+        notifyErrorMessage(serverMessage);
+    }
+
+    private void notifyErrorMessage(ErrorMessage serverMessage) {
         System.out.println(SET_TEXT_BOLD + "ERROR: " + serverMessage.getMessage());
         System.out.print(RESET_TEXT_BOLD_FAINT);
         printPrompt();
