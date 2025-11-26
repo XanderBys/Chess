@@ -53,7 +53,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         this.teamColor = teamColor;
         this.currentGame = gameData.game();
 
-        redrawBoard();
+        wsFacade.connect(authData.authToken(), gameId);
     }
 
     public void run() {
@@ -99,7 +99,8 @@ public class GameplayREPL extends REPL implements NotificationHandler {
     }
 
     private String resignConfirmation() {
-        System.out.println("Are you sure you want to resign? (Y/N)");
+        System.out.println(SET_TEXT_BOLD + "Are you sure you want to resign? (Y/N)");
+        printPrompt();
         String answer = scanner.nextLine();
 
         if (answer.equals("Y")) {

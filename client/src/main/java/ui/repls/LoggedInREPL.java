@@ -140,7 +140,7 @@ public class LoggedInREPL extends REPL {
             put(401, "There was an error authenticating you.");
         }};
 
-        Object gameList = executeServerFacadeAction("join",
+        Object gameList = executeServerFacadeAction("list",
                 (String[] p) -> {
                     try {
                         return serverFacade.getGameList(authData);

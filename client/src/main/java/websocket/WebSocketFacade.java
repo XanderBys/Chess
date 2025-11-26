@@ -37,6 +37,20 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void connect(String authToken, int gameID) {
+        // TODO: consolidate code from different commands to one function
+        try {
+            UserGameCommand connectCommand = new UserGameCommand(
+                    UserGameCommand.CommandType.CONNECT,
+                    authToken,
+                    gameID
+            );
+            session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void leave(String authToken, int gameID) throws ResponseException {
         try {
             UserGameCommand leaveCommand = new UserGameCommand(
