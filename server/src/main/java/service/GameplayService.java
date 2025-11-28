@@ -94,8 +94,15 @@ public class GameplayService {
     private void validateMove(String username, GameData data, ChessMove move) throws InvalidMoveException {
         ChessGame game = data.game();
         ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
-        ChessGame.TeamColor userColor = data.whiteUsername().equals(username) ?
-                ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+
+        ChessGame.TeamColor userColor;
+        if (data.whiteUsername().equals(username)) {
+            userColor = ChessGame.TeamColor.WHITE;
+        } else if (data.blackUsername().equals(username)) {
+            userColor = ChessGame.TeamColor.BLACK;
+        } else {
+            throw new InvalidMoveException("Observers cannot make moves.");
+        }
 
         if (game.isGameOver()) {
             throw new InvalidMoveException("You cannot make moves once the game is over.");

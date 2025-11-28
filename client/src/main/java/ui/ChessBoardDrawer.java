@@ -38,9 +38,21 @@ public class ChessBoardDrawer {
         drawBoardHighlightSquares(board, perspective, new HashSet<>());
     }
 
+    /**
+     * Draws the board and row and column headers from a given player's point of view, highlighting the squares in
+     * the 'sqaures' parameter
+     *
+     * @param board       an instance of ChessBoard to be displayed on the console
+     * @param perspective a TeamColor representing the point of view to be shown
+     * @param squares     the squares to be highlighted
+     */
     public static void drawBoardHighlightSquares(ChessBoard board,
                                                  ChessGame.TeamColor perspective,
                                                  Collection<ChessPosition> squares) {
+        if (perspective == null) {
+            perspective = ChessGame.TeamColor.WHITE;
+        }
+
         printColHeaders(perspective);
         if (perspective == ChessGame.TeamColor.WHITE) {
             for (int i = ROW_LENGTH; i >= 1; i--) {

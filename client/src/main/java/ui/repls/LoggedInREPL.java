@@ -5,7 +5,6 @@ import model.AuthData;
 import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
-import ui.ChessBoardDrawer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -51,16 +50,27 @@ public class LoggedInREPL extends REPL {
      * @return 'observe' if successful.
      */
     private String observeGame(String[] params) {
-        GameData gameData = null;
-        if (verifyParameters(1, params)) {
-            gameData = getGameByListNumber(params[0]);
-        } else {
-            System.out.println("Observe requires exactly one parameter.");
-        }
+        HashMap<Integer, String> errorMessages = new HashMap<>() {{
+            put(400, "Please check command parameters and try again.");
+            put(401, "There was an error authenticating you.");
+        }};
+        executeServerFacadeAction("observe",
+                (String[] p) -> {
+                    try {
+                        GameData gameData = getGameByListNumber(p[0]);
+                        int gameID = gameData.gameID();
+                        serverFacade.joinGame(null, gameID, authData);
+                        new GameplayREPL(scanner, authData, null, gameData).run();
+                        return gameID;
+                    } catch (IOException | URISyntaxException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                params,
+                1,
+                "",
+                errorMessages);
 
-        if (gameData != null) {
-            ChessBoardDrawer.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
-        }
         return "observe";
     }
 
