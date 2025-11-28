@@ -37,30 +37,25 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void connect(String authToken, int gameID) {
-        // TODO: consolidate code from different commands to one function
+    private void sendUserGameCommand(UserGameCommand.CommandType commandType, String authToken, int gameID) {
         try {
-            UserGameCommand connectCommand = new UserGameCommand(
-                    UserGameCommand.CommandType.CONNECT,
+            UserGameCommand cmd = new UserGameCommand(
+                    commandType,
                     authToken,
                     gameID
             );
-            session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
+            session.getBasicRemote().sendText(new Gson().toJson(cmd));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public void connect(String authToken, int gameID) {
+        sendUserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+    }
+
     public void leave(String authToken, int gameID) throws ResponseException {
-        try {
-            UserGameCommand leaveCommand = new UserGameCommand(
-                    UserGameCommand.CommandType.LEAVE,
-                    authToken,
-                    gameID);
-            session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
-        } catch (IOException e) {
-            throw new ResponseException(500, e.getMessage());
-        }
+        sendUserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
     }
 
     public void makeMove(ChessMove move, String authToken, int gameID) {
@@ -78,16 +73,7 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void resign(String authToken, int gameID) {
-        try {
-            UserGameCommand resignCommand = new UserGameCommand(
-                    UserGameCommand.CommandType.RESIGN,
-                    authToken,
-                    gameID
-            );
-            session.getBasicRemote().sendText(new Gson().toJson(resignCommand));
-        } catch (IOException e) {
-            throw new ResponseException(500, e.getMessage());
-        }
+        sendUserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
     }
 
     @Override
