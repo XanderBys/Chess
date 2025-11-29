@@ -124,6 +124,11 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         }
     }
 
+    /**
+     * Sends a 'resign' request to the server
+     *
+     * @return "resign"
+     */
     private String resign() {
         wsFacade.resign(authData.authToken(), gameId);
         return "resign";

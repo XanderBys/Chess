@@ -14,6 +14,12 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint {
     private final Session session;
 
+    /**
+     * Initializes a WebSocket connection
+     *
+     * @param url                 the server url
+     * @param notificationHandler a class to receive notifications and pass them to the user
+     */
     public WebSocketFacade(String url, NotificationHandler notificationHandler) {
         try {
             url = url.replace("http", "ws");
