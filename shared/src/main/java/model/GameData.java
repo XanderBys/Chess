@@ -6,10 +6,8 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
     public GameData addUser(ChessGame.TeamColor color, String username) {
         if (color == ChessGame.TeamColor.WHITE) {
             return new GameData(gameID, username, blackUsername, gameName, game);
-        } else if (color == ChessGame.TeamColor.BLACK) {
-            return new GameData(gameID, whiteUsername, username, gameName, game);
         } else {
-            return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+            return new GameData(gameID, whiteUsername, username, gameName, game);
         }
     }
 
