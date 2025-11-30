@@ -14,7 +14,6 @@ import model.results.ListGamesResult;
 import java.util.Collection;
 
 import static util.ParameterValidation.validateString;
-import static util.ParameterValidation.validateTeamColor;
 
 public class GameService {
     private final GameDao gameDao;
@@ -82,7 +81,6 @@ public class GameService {
     public void joinGame(JoinGameRequest request)
             throws UnauthorizedException, DataAccessException, AlreadyTakenException {
         validateString(request.authToken());
-        validateTeamColor(request.playerColor());
 
         AuthData authData = authDao.validateAuthData(request.authToken());
 

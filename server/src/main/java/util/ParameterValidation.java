@@ -1,6 +1,5 @@
 package util;
 
-import chess.ChessGame;
 import service.BadRequestException;
 
 public class ParameterValidation {
@@ -22,11 +21,5 @@ public class ParameterValidation {
 
     public static void validateString(String s) {
         validateString(s, -1);
-    }
-
-    public static void validateTeamColor(ChessGame.TeamColor color) {
-        if (color == null) {
-            throw new BadRequestException("Error: Team Color must be non-null");
-        }
     }
 }

@@ -73,17 +73,31 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         };
     }
 
+    /**
+     * Redraws the chess board
+     *
+     * @return "redraw"
+     */
     private String redrawBoard() {
         System.out.print(RESET_TEXT_BOLD_FAINT);
         ChessBoardDrawer.drawBoard(currentGame.getBoard(), teamColor);
         return "redraw";
     }
 
+    /**
+     * Allows the user to leave the chess game
+     * @return "leave"
+     */
     private String leave() {
         wsFacade.leave(authData.authToken(), gameId);
         return "leave";
     }
 
+    /**
+     * sends a make move request to the server
+     * @param params contains a string describing the start square and the end square of the move
+     * @return "makeMove"
+     */
     private String makeMove(String[] params) {
         ChessPosition fromPos = getChessPositionFromString(params[0]);
         ChessPosition toPos = getChessPositionFromString(params[1]);
@@ -110,6 +124,11 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         }
     }
 
+    /**
+     * Sends a 'resign' request to the server
+     *
+     * @return "resign"
+     */
     private String resign() {
         wsFacade.resign(authData.authToken(), gameId);
         return "resign";
@@ -152,6 +171,10 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         super.printPrompt("GAMEPLAY");
     }
 
+    /**
+     * Sends a notification to the user interface
+     * @param msg the JSON form of the notification
+     */
     public void notify(String msg) {
         ServerMessage serverMessage = deserializer.fromJson(msg, ServerMessage.class);
         switch (serverMessage.getServerMessageType()) {
