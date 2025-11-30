@@ -50,7 +50,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         this.gameId = gameData.gameID();
         this.scanner = scanner;
         this.wsFacade = new WebSocketFacade(SERVER_URL, this);
-        this.teamColor = teamColor;
+        this.teamColor = teamColor == null ? ChessGame.TeamColor.WHITE : teamColor;
         this.currentGame = gameData.game();
 
         wsFacade.connect(authData.authToken(), gameId);

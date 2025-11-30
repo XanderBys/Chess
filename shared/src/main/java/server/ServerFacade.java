@@ -49,6 +49,15 @@ public class ServerFacade {
         sendRequest(request);
     }
 
+    public void observeGame(int gameID, AuthData authData) throws URISyntaxException, IOException, InterruptedException {
+        HttpRequest request = buildRequest("/game",
+                "PUT",
+                new String[]{"authorization", authData.authToken()},
+                new JoinGameRequest(authData.authToken(), null, gameID));
+
+        sendRequest(request);
+    }
+
     /**
      * Sends a 'create' HTTP request to the server
      * @param name the name of the game to be joined
@@ -73,7 +82,7 @@ public class ServerFacade {
     /**
      * Sends a request to the HTTP server to list all games
      * @param authData an instance of AuthData
-     * @return a Collection of GameData containing the information about all of the games currently on file
+     * @return a Collection of GameData containing the information about all the games currently on file
      * @throws URISyntaxException for internal errors
      * @throws IOException for internal errors
      * @throws InterruptedException for internal errors
