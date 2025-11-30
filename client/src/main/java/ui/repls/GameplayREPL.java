@@ -25,7 +25,7 @@ import static ui.EscapeSequences.RESET_TEXT_BOLD_FAINT;
 import static ui.EscapeSequences.SET_TEXT_BOLD;
 
 public class GameplayREPL extends REPL implements NotificationHandler {
-    private static final HashMap<Character, Integer> colLetterToNumber = new HashMap<>() {{
+    private static final HashMap<Character, Integer> COL_LETTER_TO_NUMBER = new HashMap<>() {{
         put('a', 1);
         put('b', 2);
         put('c', 3);
@@ -36,7 +36,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         put('h', 8);
     }};
 
-    private static final Gson deserializer = new Gson();
+    private static final Gson DESERIALIZER = new Gson();
     
     private final AuthData authData;
     private final ChessGame.TeamColor teamColor;
@@ -107,7 +107,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
     }
 
     private ChessPosition getChessPositionFromString(String s) {
-        int col = colLetterToNumber.get(s.charAt(0));
+        int col = COL_LETTER_TO_NUMBER.get(s.charAt(0));
         int row = s.charAt(1) - '0';
         return new ChessPosition(row, col);
     }
@@ -176,7 +176,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
      * @param msg the JSON form of the notification
      */
     public void notify(String msg) {
-        ServerMessage serverMessage = deserializer.fromJson(msg, ServerMessage.class);
+        ServerMessage serverMessage = DESERIALIZER.fromJson(msg, ServerMessage.class);
         switch (serverMessage.getServerMessageType()) {
             case LOAD_GAME -> notifyLoadGameMessage(msg);
             case ERROR -> notifyErrorMessage(msg);
@@ -185,7 +185,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
     }
 
     private void notifyLoadGameMessage(String msg) {
-        LoadGameMessage serverMessage = deserializer.fromJson(msg, LoadGameMessage.class);
+        LoadGameMessage serverMessage = DESERIALIZER.fromJson(msg, LoadGameMessage.class);
         currentGame = serverMessage.getGame();
         System.out.println();
         redrawBoard();
@@ -193,7 +193,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
     }
 
     private void notifyErrorMessage(String msg) {
-        ErrorMessage serverMessage = deserializer.fromJson(msg, ErrorMessage.class);
+        ErrorMessage serverMessage = DESERIALIZER.fromJson(msg, ErrorMessage.class);
         notifyErrorMessage(serverMessage);
     }
 
@@ -204,7 +204,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
     }
 
     private void notifyNotificationMessage(String msg) {
-        NotificationMessage serverMessage = deserializer.fromJson(msg, NotificationMessage.class);
+        NotificationMessage serverMessage = DESERIALIZER.fromJson(msg, NotificationMessage.class);
         System.out.println(SET_TEXT_BOLD + serverMessage.getMessage());
         System.out.print(RESET_TEXT_BOLD_FAINT);
         printPrompt();
