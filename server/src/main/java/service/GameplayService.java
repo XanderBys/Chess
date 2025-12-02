@@ -1,9 +1,6 @@
 package service;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.InvalidMoveException;
+import chess.*;
 import dataaccess.AuthTokenDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
@@ -18,8 +15,20 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class GameplayService {
+    private static final HashMap<Integer, Character> COL_NUMBER_TO_LETTER = new HashMap<>() {{
+        put(1, 'a');
+        put(2, 'b');
+        put(3, 'c');
+        put(4, 'd');
+        put(5, 'e');
+        put(6, 'f');
+        put(7, 'g');
+        put(8, 'h');
+    }};
+
     private final GameDao gameDao;
     private final AuthTokenDao authDao;
 
@@ -43,10 +52,18 @@ public class GameplayService {
      * @throws IOException for WebSocket IO errors
      */
     public void connect(Session session, String username, UserGameCommand cmd) throws IOException {
-        ChessGame game = gameDao.getGameDataById(cmd.gameID()).game();
+        GameData gameData = gameDao.getGameDataById(cmd.gameID());
+        ChessGame.TeamColor color = getUserColorFromUsername(gameData, username);
+        String colorStr = switch (color) {
+            case WHITE -> "white";
+            case BLACK -> "black";
+            case null -> "an observer";
+        };
 
-        sendMessage(session, new LoadGameMessage(game));
-        connections.broadcast(cmd.gameID(), session, new NotificationMessage(username + " has joined the game!"));
+        sendMessage(session, new LoadGameMessage(gameData.game()));
+        connections.broadcast(cmd.gameID(),
+                session,
+                new NotificationMessage(username + " has joined the game as " + colorStr + "!"));
     }
 
     /**
@@ -68,7 +85,7 @@ public class GameplayService {
             connections.broadcast(cmd.gameID(), null, new LoadGameMessage(game));
             connections.broadcast(cmd.gameID(),
                     session,
-                    new NotificationMessage(generateMoveDescription(username, game, move)));
+                    new NotificationMessage(generateMoveDescription(username, gameData, move)));
 
             sendGameStateNotification(gameData);
         } catch (InvalidMoveException e) {
@@ -95,12 +112,8 @@ public class GameplayService {
         ChessGame game = data.game();
         ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
 
-        ChessGame.TeamColor userColor;
-        if (data.whiteUsername().equals(username)) {
-            userColor = ChessGame.TeamColor.WHITE;
-        } else if (data.blackUsername().equals(username)) {
-            userColor = ChessGame.TeamColor.BLACK;
-        } else {
+        ChessGame.TeamColor userColor = getUserColorFromUsername(data, username);
+        if (userColor == null) {
             throw new InvalidMoveException("Observers cannot make moves.");
         }
 
@@ -115,9 +128,31 @@ public class GameplayService {
         }
     }
 
-    private String generateMoveDescription(String username, ChessGame game, ChessMove move) {
+    private ChessGame.TeamColor getUserColorFromUsername(GameData data, String username) {
+        ChessGame.TeamColor userColor;
+        if (username.equals(data.whiteUsername())) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (username.equals(data.blackUsername())) {
+            return ChessGame.TeamColor.BLACK;
+        } else {
+            return null;
+        }
+    }
+
+    private String generateMoveDescription(String username, GameData gameData, ChessMove move) {
+        ChessGame game = gameData.game();
+        String color = getUserColorFromUsername(gameData, username).toString();
         ChessPiece piece = game.getBoard().getPiece(move.getEndPosition());
-        return username + " moved their " + piece.getPieceType();
+        String startSquare = chessPositionToString(move.getStartPosition());
+        String endSquare = chessPositionToString(move.getEndPosition());
+        return color + " (" + username + ") moved their " + piece.getPieceType() +
+                " from " + startSquare + " to " + endSquare;
+    }
+
+    private String chessPositionToString(ChessPosition pos) {
+        String col = String.valueOf(COL_NUMBER_TO_LETTER.get(pos.getColumn()));
+        String row = Integer.toString(pos.getRow());
+        return col + row;
     }
 
     private void sendGameStateNotification(GameData gameData) throws IOException {

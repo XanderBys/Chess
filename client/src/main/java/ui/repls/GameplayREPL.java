@@ -1,9 +1,6 @@
 package ui.repls;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
@@ -61,7 +58,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
     }
 
     @Override
-    protected String evalInput(String input) {
+    protected String evalInput(String input) throws InvalidMoveException {
         Command cmd = new Command(input);
         return switch (cmd.getName()) {
             case "redraw" -> redrawBoard();
@@ -98,7 +95,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
      * @param params contains a string describing the start square and the end square of the move
      * @return "makeMove"
      */
-    private String makeMove(String[] params) {
+    private String makeMove(String[] params) throws InvalidMoveException {
         ChessPosition fromPos = getChessPositionFromString(params[0]);
         ChessPosition toPos = getChessPositionFromString(params[1]);
         wsFacade.makeMove(new ChessMove(fromPos, toPos), authData.authToken(), gameId);
@@ -106,10 +103,14 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         return "makeMove";
     }
 
-    private ChessPosition getChessPositionFromString(String s) {
-        int col = COL_LETTER_TO_NUMBER.get(s.charAt(0));
-        int row = s.charAt(1) - '0';
-        return new ChessPosition(row, col);
+    private ChessPosition getChessPositionFromString(String s) throws InvalidMoveException {
+        try {
+            int col = COL_LETTER_TO_NUMBER.get(s.charAt(0));
+            int row = s.charAt(1) - '0';
+            return new ChessPosition(row, col);
+        } catch (Exception e) {
+            throw new InvalidMoveException("That square is not recognized.");
+        }
     }
 
     private String resignConfirmation() {
@@ -134,7 +135,7 @@ public class GameplayREPL extends REPL implements NotificationHandler {
         return "resign";
     }
 
-    private String highlightLegalMoves(String[] params) {
+    private String highlightLegalMoves(String[] params) throws InvalidMoveException {
         ChessPosition pos = getChessPositionFromString(params[0]);
         ChessPiece piece = currentGame.getBoard().getPiece(pos);
 

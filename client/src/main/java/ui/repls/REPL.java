@@ -1,5 +1,6 @@
 package ui.repls;
 
+import chess.InvalidMoveException;
 import server.ResponseException;
 import server.ServerFacade;
 
@@ -41,7 +42,7 @@ public abstract class REPL {
      * @param input a String provided by the user
      * @return the name of the action executed
      */
-    protected abstract String evalInput(String input);
+    protected abstract String evalInput(String input) throws InvalidMoveException;
 
     /**
      * Prints the prompt for a user in the terminal
